@@ -39,6 +39,7 @@ class VisitGroup < ActiveRecord::Base
   has_many :appointments
 
   acts_as_list scope: :arm
+  acts_as_list top_of_list: 0
 
   after_save :set_arm_edited_flag_on_subjects
   before_destroy :remove_appointments
