@@ -34,7 +34,7 @@ class Notifier < ActionMailer::Base
     mail(:to => email, :cc => cc, :from => @identity.email, :subject => subject)
   end
 
-  def notify_user(project_role, service_request, xls, approval, user_current, audit_report=nil)
+  def notify_user(project_role, service_request, xls, approval, audit_report=nil)
     @status = audit_report.present? ? 'request_amendment' : service_request.status
     @notes = []
     @identity = project_role.identity
@@ -59,7 +59,7 @@ class Notifier < ActionMailer::Base
     mail(:to => email, :from => NO_REPLY_FROM, :subject => subject)
   end
 
-  def notify_admin(submission_email_address, xls, user_current, ssr, audit_report=nil)
+  def notify_admin(submission_email_address, xls, ssr, audit_report=nil)
     @ssr_deleted = false
     @notes = ssr.service_request.notes
 
@@ -85,7 +85,7 @@ class Notifier < ActionMailer::Base
     mail(:to => email, :from => NO_REPLY_FROM, :subject => subject)
   end
 
-  def notify_service_provider(service_provider, service_request, attachments_to_add, user_current, ssr_id, audit_report=nil, ssr_destroyed=false, request_amendment=false)
+  def notify_service_provider(service_provider, service_request, attachments_to_add, ssr_id, audit_report=nil, ssr_destroyed=false, request_amendment=false)
     @notes = service_request.notes
 
     if ssr_destroyed

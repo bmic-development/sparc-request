@@ -118,6 +118,7 @@ class NotifierLogic
     # Does an approval need to be created?  Check that the user
     # submitting has approve rights.
     audit_report = request_amendment ? @service_request.audit_report(@current_user, @service_request.previous_submitted_at.utc, Time.now.utc) : nil
+
     service_list_false = @service_request.service_list(false)
     service_list_true = @service_request.service_list(true)
     line_items = @service_request.line_items
@@ -153,7 +154,7 @@ class NotifierLogic
         protocol = @service_request.protocol
         controller = set_instance_variables(@current_user, @service_request, service_list_false, service_list_true, line_items, protocol)
         xls = controller.render_to_string action: 'show', formats: [:xlsx]
-        Notifier.notify_admin(submission_email.email, xls, @current_user, sub_service_request, audit_report).deliver
+        Notifier.notify_admin(submission_email.email, xls, sub_service_request, audit_report).deliver
       end
     end
   end
@@ -191,7 +192,8 @@ class NotifierLogic
     end
 
     ssr_id = sub_service_request.id
-    Notifier.notify_service_provider(service_provider, @service_request, attachments, @current_user, ssr_id, audit_report, ssr_destroyed, request_amendment).deliver_now
+
+    Notifier.notify_service_provider(service_provider, @service_request, attachments, ssr_id, audit_report, ssr_destroyed, request_amendment).deliver_now
   end
 
   def ssr_has_changed?(sub_service_request) #specific ssr has changed?
