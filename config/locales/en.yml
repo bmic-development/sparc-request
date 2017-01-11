@@ -61,6 +61,7 @@ en:
       note:
         body: "Note"
       protocol:
+        research_master_id: "Research Master ID"
         human_subjects_info: "The NCT #"
 
   ########
