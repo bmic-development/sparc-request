@@ -137,7 +137,7 @@ class NotifierLogic
     # send e-mail to all folks with view and above
     @service_request.protocol.project_roles.each do |project_role|
       next if project_role.project_rights == 'none' || project_role.identity.email.blank?
-      Notifier.notify_user(project_role, @service_request, xls, approval, audit_report).deliver_now
+      Notifier.notify_user(project_role, @service_request, xls, approval, @current_user, audit_report).deliver_now
     end
   end
 
@@ -154,7 +154,7 @@ class NotifierLogic
         protocol = @service_request.protocol
         controller = set_instance_variables(@current_user, @service_request, service_list_false, service_list_true, line_items, protocol)
         xls = controller.render_to_string action: 'show', formats: [:xlsx]
-        Notifier.notify_admin(submission_email.email, xls, sub_service_request, audit_report).deliver
+        Notifier.notify_admin(submission_email.email, xls, @current_user, sub_service_request, audit_report).deliver
       end
     end
   end
@@ -193,7 +193,7 @@ class NotifierLogic
 
     ssr_id = sub_service_request.id
 
-    Notifier.notify_service_provider(service_provider, @service_request, attachments, ssr_id, audit_report, ssr_destroyed, request_amendment).deliver_now
+    Notifier.notify_service_provider(service_provider, @service_request, attachments, @current_user, ssr_id, audit_report, ssr_destroyed, request_amendment).deliver_now
   end
 
   def ssr_has_changed?(sub_service_request) #specific ssr has changed?
