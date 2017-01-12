@@ -28,6 +28,39 @@ $(document).ready ->
       $('.rm-id').addClass('required-field')
       $('.has-human-subject-info').val('true')
 
+  $(document).on 'blur', '.research-master-field', ->
+    rmId = $('.research-master-field').val()
+    unless $(this).val() == ''
+      $.ajax
+        url: "#{gon.rm_id_api_url}research_masters/#{rmId}.json"
+        type: 'GET'
+        headers: {"Authorization": "Token token=\"#{gon.rm_id_api_token}\""}
+        success: (data) ->
+          $('#protocol_short_title').val(data.short_title)
+          $('#protocol_title').val(data.long_title)
+          $('#protocol_project_roles_attributes_0_identity_id').val(data.pi_name)
+          $('#protocol_short_title').prop('disabled', true)
+          $('#protocol_title').prop('disabled', true)
+          $('#protocol_project_roles_attributes_0_identity_id').prop('disabled', true)
+        error: ->
+          swal("Error", "Research Master Record not found", "error")
+          $('#protocol_short_title').val('')
+          $('#protocol_title').val('')
+          $('#protocol_project_roles_attributes_0_identity_id').val('')
+          $('#protocol_short_title').prop('disabled', false)
+          $('#protocol_title').prop('disabled', false)
+          $('#protocol_project_roles_attributes_0_identity_id').prop('disabled', false)
+
+  $(document).on 'change', '.research-master-field', ->
+    if $(this).val() == ''
+      $('#protocol_short_title').val('')
+      $('#protocol_title').val('')
+      $('#protocol_project_roles_attributes_0_identity_id').val('')
+      $('#protocol_short_title').prop('disabled', false)
+      $('#protocol_title').prop('disabled', false)
+      $('#protocol_project_roles_attributes_0_identity_id').prop('disabled', false)
+
+
   # Protocol Edit Begin
   $(document).on 'click', '#protocol-type-button', ->
     protocol_id = $(this).data('protocol-id')
