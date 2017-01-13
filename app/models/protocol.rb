@@ -102,11 +102,6 @@ class Protocol < ActiveRecord::Base
   attr_accessible :udak_project_number
   attr_accessible :vertebrate_animals_info_attributes
   attr_accessible :research_master_id
-  attr_accessible :has_human_subject_info
-
-  validates :research_master_id, numericality: { only_integer: true }, allow_blank: true
-
-  validates :research_master_id, presence: true, if: :has_human_subject_info?
 
   attr_accessor :requester_id
   attr_accessor :validate_nct
@@ -137,9 +132,8 @@ class Protocol < ActiveRecord::Base
     validate :primary_pi_exists
   end
 
-  def has_human_subject_info?
-    self.has_human_subject_info == true
-  end
+  validates :research_master_id, numericality: { only_integer: true }, allow_blank: true
+  validates :research_master_id, presence: true, if: :has_human_subject_info?
 
   validate :existing_rm_id,
     if: -> record { record.has_human_subject_info? && !record.research_master_id.nil? }
@@ -283,6 +277,10 @@ class Protocol < ActiveRecord::Base
 
   def is_project?
     self.type == 'Project'
+  end
+
+  def has_human_subject_info?
+    research_types_info.human_subjects
   end
 
   # Determines whether a protocol contains a service_request with only a "first draft" status

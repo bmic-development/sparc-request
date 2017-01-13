@@ -19,15 +19,6 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 $(document).ready ->
-
-  $(document).on 'click', '.human-subjects', ->
-    if $('.rm-id').hasClass('required-field')
-      $('.rm-id').removeClass('required-field')
-      $('.has-human-subject-info').val('false')
-    else
-      $('.rm-id').addClass('required-field')
-      $('.has-human-subject-info').val('true')
-
   # Protocol Edit Begin
   $(document).on 'click', '#protocol-type-button', ->
     protocol_id = $(this).data('protocol-id')
@@ -206,9 +197,13 @@ $(document).ready ->
 
   ###HUMAN SUBJECTS FIELDS DISPLAY###
   $(document).on 'change', '#protocol_research_types_info_attributes_human_subjects', ->
-    switch $(this).attr('checked')
-      when 'checked' then $('.human_subjects_dependent').show()
-      else $('.human_subjects_dependent').hide()
+    switch $(this).attr('checked') 
+      when 'checked'
+        $('.human_subjects_dependent').show()
+        $('.rm-id').addClass('required')
+      else
+        $('.human_subjects_dependent').hide()
+        $('.rm-id').removeClass('required')
   ###END HUMAN SUBJECTS FIELDS DISPLAY###
 
 
