@@ -197,7 +197,7 @@ $(document).ready ->
 
   ###HUMAN SUBJECTS FIELDS DISPLAY###
   $(document).on 'change', '#protocol_research_types_info_attributes_human_subjects', ->
-    switch $(this).attr('checked')
+    switch $(this).attr('checked') 
       when 'checked'
         $('.human_subjects_dependent').show()
         $('.rm-id').addClass('required')
