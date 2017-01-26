@@ -138,7 +138,7 @@ class Protocol < ActiveRecord::Base
   end
 
   def has_human_subject_info?
-    self.has_human_subject_info == true
+    self.has_human_subject_info == false
   end
 
   validate :existing_rm_id,
