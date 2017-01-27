@@ -1,8 +1,8 @@
 require 'progress_bar'
 
-task :multiple_nexus_ssrs => :environment do
+AUDIT_COMMENT = "multiple_nexus_ssrs"
 
-  AUDIT_COMMENT = "multiple_nexus_ssrs"
+task :multiple_nexus_ssrs => :environment do
   ServiceRequest.skip_callback(:save, :after, :set_original_submitted_date)
   nexus_org = 14
   multiple_ssrs_fp = CSV.open("tmp/multiple_ssrs.csv", "w")
@@ -71,9 +71,11 @@ task :multiple_nexus_ssrs => :environment do
       raise "Protocol #{protocol.id} has multiple SSR's under Organization 14"
     end
 
+    delete_empty_srs(protocol)
+
     # Merge remaining service requests into service request with most recently
     # updated status
-    recent_service_request = protocol.service_requests.joins(:line_items).preload(:audits).distinct.map do |sr|
+    recent_service_request = protocol.service_requests.preload(:audits).distinct.map do |sr|
       last_status_change = sr.audits.reverse.find { |a| a.audited_changes["status"] }
       if last_status_change
         [sr, last_status_change.created_at]
@@ -83,10 +85,10 @@ task :multiple_nexus_ssrs => :environment do
     end
 
     recent_service_request = if recent_service_request.empty?
-      protocol.service_requests.first
-    else
       # If audit trail runs out, use most recently updated ServiceRequest
       protocol.service_requests.order(:updated_at).last
+    else
+      recent_service_request.last[0]
     end
 
     # And the latest submitted_at date
@@ -131,24 +133,27 @@ task :multiple_nexus_ssrs => :environment do
       end
     end
 
-    # Delete service requests with no ssr's.
-    protocol.service_requests.includes(:sub_service_requests).where(sub_service_requests: { id: nil }).each do |sr|
-      begin
-        sr.destroy
-        sr.audits.last.update(comment: AUDIT_COMMENT)
-      rescue
-        # Probably a funky Note body...
-        sr.notes.each do |note|
-          note.assign_attributes({ notable_id: nil, audit_comment: AUDIT_COMMENT }, without_protection: true)
-          note.save(validate: false)
-        end
-        sr.reload.destroy
-        sr.audits.last.update(comment: AUDIT_COMMENT)
-      end
-    end
+    delete_empty_srs(protocol)
 
     bar2.increment!
   end
 
   cant_delete_fp.close
+end
+
+def delete_empty_srs(protocol)
+  protocol.service_requests.includes(:sub_service_requests).where(sub_service_requests: { id: nil }).each do |sr|
+    begin
+      sr.destroy
+      sr.audits.last.update(comment: AUDIT_COMMENT)
+    rescue
+      # Probably a funky Note body...
+      sr.notes.each do |note|
+        note.assign_attributes({ notable_id: nil, audit_comment: AUDIT_COMMENT }, without_protection: true)
+        note.save(validate: false)
+      end
+      sr.reload.destroy
+      sr.audits.last.update(comment: AUDIT_COMMENT)
+    end
+  end
 end
