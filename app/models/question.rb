@@ -18,27 +18,23 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class Provider < Organization
-  belongs_to :institution, :class_name => "Organization", :foreign_key => "parent_id"
-  has_many :programs, :dependent => :destroy, :foreign_key => "parent_id"
+class Question < ActiveRecord::Base
+  belongs_to :section
 
-  # Surveys associated with this service
-  has_many :associated_surveys, as: :surveyable
+  has_many :options,            dependent: :destroy
+  has_many :question_responses, dependent: :destroy
 
-  def populate_for_edit
-    self.setup_available_statuses
-  end
+  attr_accessible :section_id
+  attr_accessible :content
+  attr_accessible :question_type
+  attr_accessible :description
+  attr_accessible :required
 
-  def setup_available_statuses
-    position = 1
-    obj_names = AvailableStatus::TYPES.map{|k,v| k}
-    obj_names.each do |obj_name|
-      available_status = available_statuses.detect{|obj| obj.status == obj_name}
-      available_status = available_statuses.build(:status => obj_name, :new => true) unless available_status
-      available_status.position = position
-      position += 1
-    end
+  validates :content,
+            :question_type,
+            presence: true
 
-    available_statuses.sort{|a, b| a.position <=> b.position}
-  end
+  validates :required, inclusion: { in: [true, false] }
+
+  accepts_nested_attributes_for :options, allow_destroy: true
 end

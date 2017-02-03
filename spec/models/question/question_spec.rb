@@ -18,27 +18,18 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class Provider < Organization
-  belongs_to :institution, :class_name => "Organization", :foreign_key => "parent_id"
-  has_many :programs, :dependent => :destroy, :foreign_key => "parent_id"
+require 'rails_helper'
 
-  # Surveys associated with this service
-  has_many :associated_surveys, as: :surveyable
-
-  def populate_for_edit
-    self.setup_available_statuses
+RSpec.describe Question, type: :model do
+  it 'should have a valid factory' do
+    expect(build(:question)).to be_valid
   end
+  
+  it { is_expected.to belong_to(:section) }
 
-  def setup_available_statuses
-    position = 1
-    obj_names = AvailableStatus::TYPES.map{|k,v| k}
-    obj_names.each do |obj_name|
-      available_status = available_statuses.detect{|obj| obj.status == obj_name}
-      available_status = available_statuses.build(:status => obj_name, :new => true) unless available_status
-      available_status.position = position
-      position += 1
-    end
+  it { is_expected.to have_many(:options).dependent(:destroy) }
+  it { is_expected.to have_many(:question_responses).dependent(:destroy) }
 
-    available_statuses.sort{|a, b| a.position <=> b.position}
-  end
+  it { is_expected.to validate_presence_of(:content) }
+  it { is_expected.to validate_presence_of(:question_type) }
 end
