@@ -19,6 +19,8 @@
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class AssociatedSurvey < ActiveRecord::Base
+  audited
+  
   belongs_to :survey
   belongs_to :surveyable, polymorphic: true
   
