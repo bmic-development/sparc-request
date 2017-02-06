@@ -24,8 +24,9 @@ RSpec.describe Option, type: :model do
   it 'should have a valid factory' do
     expect(build(:option)).to be_valid
   end
-  
+
   it { is_expected.to belong_to(:question) }
 
+  it { is_expected.to have_many(:dependents).class_name('Question') }
   it { is_expected.to validate_presence_of(:content) }
 end

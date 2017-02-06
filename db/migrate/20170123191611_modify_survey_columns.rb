@@ -57,6 +57,7 @@ class ModifySurveyColumns < ActiveRecord::Migration
     end
     create_table :questions do |t|
       t.references  :section,       index: true, foreign_key: true
+      t.boolean     :is_dependent,  null: false
       t.text        :content,       null: false
       t.string      :question_type, null: false
       t.string      :description
@@ -85,6 +86,9 @@ class ModifySurveyColumns < ActiveRecord::Migration
       t.timestamps              null: false
     end
 
+    add_reference :questions, :depender, references: :options, index: true
+    add_foreign_key :questions, :options, column: :depender_id
+
     Survey.reset_column_information
     Section.reset_column_information
     Question.reset_column_information
@@ -111,7 +115,7 @@ class ModifySurveyColumns < ActiveRecord::Migration
       new_survey.updated_at = survey.updated_at
       new_survey.save(validate: false)
 
-      AssociatedSurvey.where(survey: survey).update_all(survey: new_survey)
+      AssociatedSurvey.where(survey_id: survey.id).update_all(survey_id: new_survey.id)
 
       corresponding_question_ids = {}
       sections.select{|s| s.survey_id == survey.id}.each do |section|
@@ -126,6 +130,8 @@ class ModifySurveyColumns < ActiveRecord::Migration
         questions.select{|q| q.survey_section_id == section.id}.each do |question|
           new_question = Question.new(
             section_id:     new_section.id,
+            depender_id:   nil,
+            is_dependent:   false,
             content:        question.text,
             question_type:  get_question_type(question),
             description:    "",
@@ -178,9 +184,9 @@ class ModifySurveyColumns < ActiveRecord::Migration
   def get_question_type(question)
     case question.pick
     when 'one'
-      'radio'
+      'radio_button'
     when 'none'
-      'text_area'
+      'textarea'
     else
       ''
     end

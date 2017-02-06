@@ -21,6 +21,7 @@
 FactoryGirl.define do
   factory :question do
     section       nil
+    is_dependent  { false }
     content       { Faker::Lorem.sentence(4) }
     question_type { Faker::Lorem.word() }
     required      { false }

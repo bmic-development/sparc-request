@@ -26,9 +26,11 @@ RSpec.describe Question, type: :model do
   end
   
   it { is_expected.to belong_to(:section) }
+  it { is_expected.to belong_to(:depender).class_name('Option') }
 
   it { is_expected.to have_many(:options).dependent(:destroy) }
   it { is_expected.to have_many(:question_responses).dependent(:destroy) }
+  it { is_expected.to have_many(:dependents).through(:options) }
 
   it { is_expected.to validate_presence_of(:content) }
   it { is_expected.to validate_presence_of(:question_type) }

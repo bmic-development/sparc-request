@@ -21,6 +21,8 @@
 class Option < ActiveRecord::Base
   belongs_to :question
 
+  has_many :dependents, class_name: 'Question', foreign_key: :depender_id, dependent: :destroy
+
   attr_accessible :question_id
   attr_accessible :content
 

@@ -745,14 +745,17 @@ ActiveRecord::Schema.define(version: 20170123191611) do
 
   create_table "questions", force: :cascade do |t|
     t.integer  "section_id",    limit: 4
+    t.boolean  "is_dependent",                null: false
     t.text     "content",       limit: 65535, null: false
     t.string   "question_type", limit: 255,   null: false
     t.string   "description",   limit: 255
     t.boolean  "required",                    null: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+    t.integer  "depender_id",   limit: 4
   end
 
+  add_index "questions", ["depender_id"], name: "index_questions_on_depender_id", using: :btree
   add_index "questions", ["section_id"], name: "index_questions_on_section_id", using: :btree
 
   create_table "quick_questions", force: :cascade do |t|
@@ -1048,18 +1051,15 @@ ActiveRecord::Schema.define(version: 20170123191611) do
   add_index "super_users", ["organization_id"], name: "index_super_users_on_organization_id", using: :btree
 
   create_table "surveys", force: :cascade do |t|
-    t.integer  "organization_id", limit: 4
-    t.string   "title",           limit: 255, null: false
-    t.string   "description",     limit: 255
-    t.string   "access_code",     limit: 255, null: false
-    t.integer  "display_order",   limit: 4,   null: false
-    t.integer  "version",         limit: 4,   null: false
-    t.boolean  "active",                      null: false
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.string   "title",         limit: 255, null: false
+    t.string   "description",   limit: 255
+    t.string   "access_code",   limit: 255, null: false
+    t.integer  "display_order", limit: 4,   null: false
+    t.integer  "version",       limit: 4,   null: false
+    t.boolean  "active",                    null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
-
-  add_index "surveys", ["organization_id"], name: "index_surveys_on_organization_id", using: :btree
 
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
@@ -1200,6 +1200,7 @@ ActiveRecord::Schema.define(version: 20170123191611) do
   add_foreign_key "questionnaire_responses", "items"
   add_foreign_key "questionnaire_responses", "submissions"
   add_foreign_key "questionnaires", "services"
+  add_foreign_key "questions", "options", column: "depender_id"
   add_foreign_key "questions", "sections"
   add_foreign_key "responses", "identities"
   add_foreign_key "responses", "sub_service_requests"
@@ -1210,5 +1211,4 @@ ActiveRecord::Schema.define(version: 20170123191611) do
   add_foreign_key "submissions", "protocols"
   add_foreign_key "submissions", "questionnaires"
   add_foreign_key "submissions", "services"
-  add_foreign_key "surveys", "organizations"
 end

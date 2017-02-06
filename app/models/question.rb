@@ -20,11 +20,15 @@
 
 class Question < ActiveRecord::Base
   belongs_to :section
+  belongs_to :depender, class_name: 'Option'
 
-  has_many :options,            dependent: :destroy
+  has_many :options, dependent: :destroy
   has_many :question_responses, dependent: :destroy
+  has_many :dependents, through: :options
 
   attr_accessible :section_id
+  attr_accessible :is_dependent
+  attr_accessible :dependent_id
   attr_accessible :content
   attr_accessible :question_type
   attr_accessible :description
@@ -34,7 +38,9 @@ class Question < ActiveRecord::Base
             :question_type,
             presence: true
 
-  validates :required, inclusion: { in: [true, false] }
+  validates :required,
+            :is_dependent,
+            inclusion: { in: [true, false] }
 
   accepts_nested_attributes_for :options, allow_destroy: true
 end
