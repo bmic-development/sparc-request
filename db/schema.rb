@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170118151049) do
+ActiveRecord::Schema.define(version: 20170207131751) do
 
   create_table "admin_rates", force: :cascade do |t|
     t.integer  "line_item_id", limit: 4
@@ -357,6 +357,9 @@ ActiveRecord::Schema.define(version: 20170118151049) do
     t.string   "email",                        limit: 255
     t.string   "last_name",                    limit: 255
     t.string   "first_name",                   limit: 255
+    t.string   "institution",                  limit: 255
+    t.string   "college",                      limit: 255
+    t.string   "department",                   limit: 255
     t.string   "era_commons_name",             limit: 255
     t.string   "credentials",                  limit: 255
     t.string   "subspecialty",                 limit: 255
@@ -962,6 +965,14 @@ ActiveRecord::Schema.define(version: 20170118151049) do
 
   add_index "sessions", ["session_id"], name: "index_sessions_on_session_id", using: :btree
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
+
+  create_table "study_phases", force: :cascade do |t|
+    t.integer  "order",      limit: 4
+    t.string   "phase",      limit: 255
+    t.integer  "version",    limit: 4,   default: 1
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
 
   create_table "study_type_answers", force: :cascade do |t|
     t.integer  "protocol_id",            limit: 4

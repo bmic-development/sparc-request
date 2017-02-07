@@ -54,6 +54,8 @@ class Protocol < ActiveRecord::Base
   has_many :coordinators, -> { where(project_roles: { role: 'research-assistant-coordinator' }) },
     source: :identity, through: :project_roles
 
+  has_and_belongs_to_many :study_phase
+  
   belongs_to :study_type_question_group
 
   attr_accessible :affiliations_attributes
