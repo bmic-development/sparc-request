@@ -30,9 +30,9 @@
         .col-lg-12
           .panel-group
             - if protocol.type == "Study"
-              = render partial: 'protocols/view_details/study_fields', locals: {protocol: protocol}
+              = render partial: 'view_details/study_fields', locals: {protocol: protocol}
             - elsif protocol.type == "Project"
-              = render partial: 'protocols/view_details/project_fields', locals: {protocol: protocol}
+              = render partial: 'view_details/project_fields', locals: {protocol: protocol}
     .modal-footer
       %button.btn.btn-default{ type: 'button', data: { dismiss: 'modal' } }
         = t(:actions)[:close]
