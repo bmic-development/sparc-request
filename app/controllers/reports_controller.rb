@@ -64,7 +64,6 @@ class ReportsController < ApplicationController
     report_params = params[:report]
     report = report_params[:type]
     @report = report.constantize.new report_params
-
     # generate excel
     tempfile = @report.to_excel
     send_file tempfile.path, :filename => 'report.xlsx', :disposition => 'inline', :type =>  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
