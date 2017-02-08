@@ -321,7 +321,7 @@ en:
           separator: "-OR-"
           non_phs_sponsor: "Federal Non-PHS Sponsor:"
           serial_number: "Federal Grant Serial Number:"
-        phase: "Study Phase:"
+        phase: "Study Phase(s):"
         sponsor: "Sponsor Name:"
         push_to_epic: "Publish Study in Epic:"
         study_type_questions: "Study Type Questions:"
