@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170207131751) do
+ActiveRecord::Schema.define(version: 20170207151128) do
 
   create_table "admin_rates", force: :cascade do |t|
     t.integer  "line_item_id", limit: 4
@@ -698,7 +698,6 @@ ActiveRecord::Schema.define(version: 20170207131751) do
     t.string   "sponsor_name",                          limit: 255
     t.text     "brief_description",                     limit: 65535
     t.decimal  "indirect_cost_rate",                                  precision: 5, scale: 2
-    t.string   "study_phase",                           limit: 255
     t.string   "udak_project_number",                   limit: 255
     t.string   "funding_rfa",                           limit: 255
     t.string   "funding_status",                        limit: 255
@@ -731,6 +730,14 @@ ActiveRecord::Schema.define(version: 20170207131751) do
   end
 
   add_index "protocols", ["next_ssr_id"], name: "index_protocols_on_next_ssr_id", using: :btree
+
+  create_table "protocols_study_phases", id: false, force: :cascade do |t|
+    t.integer "protocol_id",    limit: 4, null: false
+    t.integer "study_phase_id", limit: 4, null: false
+  end
+
+  add_index "protocols_study_phases", ["protocol_id", "study_phase_id"], name: "index_protocols_study_phases_on_protocol_id_and_study_phase_id", using: :btree
+  add_index "protocols_study_phases", ["study_phase_id", "protocol_id"], name: "index_protocols_study_phases_on_study_phase_id_and_protocol_id", using: :btree
 
   create_table "question_groups", force: :cascade do |t|
     t.text     "text",                   limit: 65535

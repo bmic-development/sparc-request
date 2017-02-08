@@ -54,7 +54,7 @@ class Protocol < ActiveRecord::Base
   has_many :coordinators, -> { where(project_roles: { role: 'research-assistant-coordinator' }) },
     source: :identity, through: :project_roles
 
-  has_and_belongs_to_many :study_phase
+  has_and_belongs_to_many :study_phases
   
   belongs_to :study_type_question_group
 
@@ -95,7 +95,7 @@ class Protocol < ActiveRecord::Base
   attr_accessible :short_title
   attr_accessible :sponsor_name
   attr_accessible :start_date
-  attr_accessible :study_phase
+  attr_accessible :study_phase_ids
   attr_accessible :study_type_answers_attributes
   attr_accessible :study_type_question_group_id
   attr_accessible :study_types_attributes
