@@ -1,4 +1,3 @@
--# Copyright © 2011 MUSC Foundation for Research Development
 -# All rights reserved.
 
 -# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,44 +16,22 @@
 -# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 -# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 -# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-.panel.panel-primary#summary-panel
-  .panel-heading
-    %h1.panel-title.pull-left
-      = I18n.t('protocols.summary.header', protocol_type: protocol_type)
-    .pull-right
-      = link_to I18n.t('protocols.view_details.button', protocol_type: protocol_type), protocol_view_details_path( protocol ), class: "btn btn-sm btn-info view-protocol-details-button", remote: true
-      - if allow_edit
-        = link_to I18n.t('protocols.edit', protocol_type: protocol_type), edit_protocol_path(protocol, srid: service_request.id), class: 'btn btn-warning edit-protocol-information-button'
-    .clearfix
-  .panel-body#protocol-summary.text-left
-    .row
-      .col-sm-3
-        %label
-          = I18n.t('protocols.summary.id', protocol_type: protocol_type)
-      .col-sm-9
-        = protocol.try(:id)
-    .row
-      .col-sm-3
-        %label
-          = t(:protocols)[:summary][:title]
-      .col-sm-9
-        = protocol.try(:title)
-    .row
-      .col-sm-3
-        %label
-          = t(:protocols)[:summary][:short_title]
-      .col-sm-9
-        = protocol.try(:short_title)
-    - if protocol_type == 'Study'
+.modal-dialog.view-protocol-details-modal
+  .modal-content
+    .modal-header
+      %button.close{ type: 'button', data: { dismiss: 'modal' } }
+        %span{ aria: { hidden: 'true' } } &times;
+      %h4.text-center#modal-title
+        = I18n.t('protocols.view_details.header', protocol_type: protocol.type, protocol_id: protocol.id)
+    .modal-body
+      #modal_errors
       .row
-        .col-sm-3
-          %label
-            = t(:protocols)[:summary][:sponsor]
-        .col-sm-9
-          = protocol.try(:sponsor_name)
-    .row
-      .col-sm-3
-        %label
-          = display_funding_source_title(protocol)
-      .col-sm-9
-        = display_funding_source(protocol)
+        .col-lg-12
+          .panel-group
+            - if protocol.type == "Study"
+              = render partial: 'protocols/view_details/study_fields', locals: {protocol: protocol}
+            - elsif protocol.type == "Project"
+              = render partial: 'protocols/view_details/project_fields', locals: {protocol: protocol}
+    .modal-footer
+      %button.btn.btn-default{ type: 'button', data: { dismiss: 'modal' } }
+        = t(:actions)[:close]
