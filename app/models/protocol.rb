@@ -185,30 +185,37 @@ class Protocol < ActiveRecord::Base
     ]
   )
 
-  scope :search_query, -> (search_term) {
+  scope :search_query, lambda { |search_attrs|
     # Searches protocols based on short_title, title, id, and associated_users
     # Protects against SQL Injection with ActiveRecord::Base::sanitize
 
     # inserts ! so that we can escape special characters
-    escaped_search_term = search_term.to_s.gsub(/[!%_]/) { |x| '!' + x }
+    escaped_search_term = search_attrs[:search_text].to_s.gsub(/[!%_]/) { |x| '!' + x }
 
     like_search_term = ActiveRecord::Base::sanitize("%#{escaped_search_term}%")
-    exact_search_term = ActiveRecord::Base::sanitize(search_term)
+    exact_search_term = ActiveRecord::Base::sanitize(search_attrs[:search_text])
 
-    #TODO temporary replacement for "MATCH(identities.first_name, identities.last_name) AGAINST (#{exact_search_term})"
-    where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
 
-    where_clause += ["protocols.short_title like #{like_search_term} escape '!'",
+
+    if search_attrs[:search_drop] == "Identity"
+      where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
+      joins(:identities).where(where_clause.compact.join(' OR ')).
+      distinct
+    elsif search_attrs[:search_drop] == "Protocol"
+      where_clause = ["protocols.short_title like #{like_search_term} escape '!'",
       "protocols.title like #{like_search_term} escape '!'",
       "protocols.id = #{exact_search_term}"]
-
-    where_clause += ["human_subjects_info.hr_number = #{exact_search_term}", 
-                      "human_subjects_info.pro_number = #{exact_search_term}"]
-
-    joins(:identities).joins(:human_subjects_info).
+    elsif search_attrs[:search_drop] == "HR#"
+      where_clause = ["human_subjects_info.hr_number like #{like_search_term} escape '!'"]
+      joins(:human_subjects_info).
       where(where_clause.compact.join(' OR ')).
       distinct
-
+    elsif search_attrs[:search_drop] == "Pro#"
+      where_clause = ["human_subjects_info.pro_number like #{like_search_term} escape '!'"]
+      joins(:human_subjects_info).
+      where(where_clause.compact.join(' OR ')).
+      distinct
+    end
   }
 
   scope :for_identity_id, -> (identity_id) {

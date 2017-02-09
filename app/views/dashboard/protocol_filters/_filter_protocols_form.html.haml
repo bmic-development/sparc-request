@@ -34,9 +34,11 @@
     .panel-body
       #protocol_filter_form_display
         .form-group.row
-          = form.label :search_query, t(:actions)[:search], class: 'col-lg-3 control-label'
-          .col-lg-9
-            = form.text_field :search_query, class: 'form-control'
+          = form.fields_for :search_query do |search_queries|
+            .col-lg-5
+              = search_queries.select :search_drop, ['Identity', 'Protocol', 'HR#', 'Pro#'], { prompt:  "Search" }, class: "form-control selectpicker"
+            .col-lg-7
+              = search_queries.text_field :search_text, class: 'form-control'
 
         .form-group.row
           = form.label :show_archived, t(:dashboard)[:protocol_filters][:archived], class: 'col-lg-10 control-label'
