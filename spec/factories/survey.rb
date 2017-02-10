@@ -21,8 +21,13 @@
 FactoryGirl.define do
   factory :survey do
     title          { Faker::Lorem.word }
-    description    { Faker::Lorem.word }
     access_code    { Faker::Lorem.word }
-    survey_version { 0 }
+    display_order  { 0 }
+    version        { 0 }
+    active         false
+  end
+
+  trait :active do
+    active true
   end
 end
