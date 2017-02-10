@@ -157,6 +157,7 @@ en:
     ######################
     protocol_filters:
       header: "Filter Protocols"
+      search_by: "Search By"
       archived: "Archived"
       inactive: "(inactive)"
       status: "Status"
