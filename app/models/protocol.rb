@@ -195,16 +195,24 @@ class Protocol < ActiveRecord::Base
     like_search_term = ActiveRecord::Base::sanitize("%#{escaped_search_term}%")
     exact_search_term = ActiveRecord::Base::sanitize(search_attrs[:search_text])
 
+    # if search_attrs[:search_drop] == "Identity"
+    #   where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
+    #   joins(:identities).where(where_clause.compact.join(' OR ')).
+    #   distinct
 
 
-    if search_attrs[:search_drop] == "Identity"
+    if search_attrs[:search_drop] == "PI"
       where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
-      joins(:identities).where(where_clause.compact.join(' OR ')).
-      distinct
+
+      joins(:identities).
+      where(where_clause.compact.join(' OR ')).
+      joins(:project_roles).where(role: 'primary-pi').distinct
     elsif search_attrs[:search_drop] == "Protocol"
       where_clause = ["protocols.short_title like #{like_search_term} escape '!'",
       "protocols.title like #{like_search_term} escape '!'",
       "protocols.id = #{exact_search_term}"]
+      where(where_clause.compact.join(' OR ')).
+      distinct
     elsif search_attrs[:search_drop] == "HR#"
       where_clause = ["human_subjects_info.hr_number like #{like_search_term} escape '!'"]
       joins(:human_subjects_info).
@@ -216,6 +224,8 @@ class Protocol < ActiveRecord::Base
       where(where_clause.compact.join(' OR ')).
       distinct
     end
+
+
   }
 
   scope :for_identity_id, -> (identity_id) {
