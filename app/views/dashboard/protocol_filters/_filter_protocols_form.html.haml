@@ -33,12 +33,14 @@
     = form.hidden_field :sorted_by
     .panel-body
       #protocol_filter_form_display
-        .form-group.row
-          = form.fields_for :search_query do |search_queries|
-            .col-lg-5
-              = search_queries.select :search_drop, ['Identity', 'Protocol', 'HR#', 'Pro#'], { prompt:  "Search" }, class: "form-control selectpicker"
-            .col-lg-7
-              = search_queries.text_field :search_text, class: 'form-control'
+        .form-group.row.search_padding
+          .col-lg-12
+            .input-group
+              = form.fields_for :search_query do |search_queries|
+                .input-group-btn
+                  .dd_select
+                    = search_queries.select :search_drop, ['Authorized User', 'HR#', 'PI', 'Protocol', 'PRO#'], { prompt:  t(:dashboard)[:protocol_filters][:search_by] }, class: "form-control selectpicker ", data: { style: 'dropdown_filter' }  
+                = search_queries.text_field :search_text, class: 'form-control', disabled: true
 
         .form-group.row
           = form.label :show_archived, t(:dashboard)[:protocol_filters][:archived], class: 'col-lg-10 control-label'
