@@ -53,9 +53,10 @@ RSpec.describe "view_details/view_details.html.haml", type: :view do
   describe "view details of a study" do
     before(:each) do
       protocol = create(
-        :unarchived_study_without_validations,
+        :study_without_validations_with_question_groups,
         primary_pi: user,
-        research_master_id: 1
+        research_master_id: 1,
+        selected_for_epic: true
       )
       render "view_details/view_details.html.haml", protocol: protocol
     end
@@ -69,6 +70,8 @@ RSpec.describe "view_details/view_details.html.haml", type: :view do
       expect(response).to render_template(partial: "view_details/_study_type")
       expect(response).to render_template(partial: "view_details/_impact_areas")
       expect(response).to render_template(partial: "view_details/_affiliations")
+      expect(response).to render_template(partial: "view_details/_study_type_note")
+      expect(response).to render_template(partial: "view_details/_epic_questions_answers")
     end
   end
 end
