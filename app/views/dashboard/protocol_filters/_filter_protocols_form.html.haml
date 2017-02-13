@@ -39,7 +39,7 @@
               = form.fields_for :search_query do |search_queries|
                 .input-group-btn
                   .dd_select
-                    = search_queries.select :search_drop, ['Authorized User', 'HR#', 'PI', 'Protocol', 'PRO#'], { prompt:  t(:dashboard)[:protocol_filters][:search_by] }, class: "form-control selectpicker ", data: { style: 'dropdown_filter' }  
+                    = search_queries.select :search_drop, @search_by, { prompt:  t(:dashboard)[:protocol_filters][:search_by] }, class: "form-control selectpicker ", data: { style: 'dropdown_filter' }  
                 = search_queries.text_field :search_text, class: 'form-control', disabled: true
 
         .form-group.row
