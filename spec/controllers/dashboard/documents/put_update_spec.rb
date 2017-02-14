@@ -75,9 +75,9 @@ RSpec.describe Dashboard::DocumentsController do
                             create(:super_user, identity: logged_in_user, organization: organization)
           @document       = create(:document, protocol: @protocol)
           params          = { org_ids: [organization.id], id: @document.id, document: { protocol: @protocol, doc_type: 'Protocol' } }
-          
+
           xhr :put, :update, params, format: :js
-        end 
+        end
 
         it 'should update the document' do
           expect(@document.reload.doc_type).to eq('Protocol')
@@ -116,8 +116,8 @@ RSpec.describe Dashboard::DocumentsController do
       before :each do
         protocol  = create(:protocol_without_validations, primary_pi: other_user)
         document  = create(:document, protocol: protocol)
-        
-        xhr :put, :update, id: document.id, format: :js
+
+        xhr :put, :update, id: document.id, document: { doc_type: 'important' }, format: :js
       end
 
       it { is_expected.to respond_with :ok }
@@ -135,7 +135,7 @@ RSpec.describe Dashboard::DocumentsController do
 
         document.sub_service_requests = [ssr]
 
-        xhr :put, :update, id: document.id, format: :js
+        xhr :put, :update, id: document.id, document: { doc_type: 'important' }, format: :js
       end
 
       it { is_expected.to respond_with :ok }
@@ -147,7 +147,7 @@ RSpec.describe Dashboard::DocumentsController do
         protocol  = create(:protocol_without_validations, primary_pi: other_user)
         document  = create(:document, protocol: protocol)
 
-        xhr :put, :update, id: document.id, format: :js
+        xhr :put, :update, id: document.id, document: { doc_type: 'important' }, format: :js
       end
 
       it { is_expected.to respond_with :ok }
