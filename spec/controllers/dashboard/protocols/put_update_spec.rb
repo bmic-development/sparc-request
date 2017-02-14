@@ -161,6 +161,29 @@ RSpec.describe Dashboard::ProtocolsController do
 
         it { is_expected.to respond_with :ok }
       end
+
+      context 'edit Protocol study phases' do
+        before :each do
+          @logged_in_user = create(:identity)
+          @protocol       = create(:protocol_without_validations, type: 'Project')
+          organization    = create(:organization)
+          service_request = create(:service_request_without_validations, protocol: @protocol)
+                            create(:sub_service_request_without_validations, organization: organization, service_request: service_request, status: 'draft')
+                            create(:service_provider, identity: @logged_in_user, organization: organization)
+
+          @study_phase1 = StudyPhase.create()  
+          @study_phase2 = StudyPhase.create()   
+          log_in_dashboard_identity(obj: @logged_in_user)
+
+          xhr :get, :update, id: @protocol.id, protocol: { title: "some value", study_phase_ids: ["#{@study_phase1.id}", "#{@study_phase2.id}"] }
+        end
+
+        it 'should set @admin to true' do
+          expect(assigns(:protocol).study_phases).to eq([@study_phase1, @study_phase2])
+        end
+
+        it { is_expected.to respond_with :ok }
+      end
     end
   end
 end
