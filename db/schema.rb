@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170207151128) do
+ActiveRecord::Schema.define(version: 20170209182022) do
 
   create_table "admin_rates", force: :cascade do |t|
     t.integer  "line_item_id", limit: 4
@@ -688,6 +688,7 @@ ActiveRecord::Schema.define(version: 20170207151128) do
     t.datetime "updated_at"
     t.string   "admin_filter",      limit: 255
     t.string   "with_owner",        limit: 255
+    t.string   "search_filter",     limit: 255
   end
 
   create_table "protocols", force: :cascade do |t|
@@ -923,10 +924,6 @@ ActiveRecord::Schema.define(version: 20170207151128) do
     t.integer  "protocol_id",             limit: 4
     t.string   "status",                  limit: 255
     t.boolean  "approved"
-    t.integer  "subject_count",           limit: 4
-    t.datetime "consult_arranged_date"
-    t.datetime "pppv_complete_date"
-    t.datetime "pppv_in_process_date"
     t.datetime "submitted_at"
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
