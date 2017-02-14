@@ -203,6 +203,35 @@ class Protocol < ActiveRecord::Base
       joins(:identities).
       where(where_clause.compact.join(' OR ')).
       distinct
+
+      puts "hhhhh"
+      puts Protocol.count
+      puts "hhhhh"
+
+      a = Protocol.all.map(&:principal_investigators)
+      puts "&&&&&"
+      puts a.inspect
+      puts "&&&&&"
+
+      b = joins(:principal_investigators)
+      puts "@@@@@@"
+      puts b.inspect
+      puts "@@@@@@"
+
+      pi = Protocol.all.joins(:project_roles).where(project_roles: { role: %w(pi primary-pi) })
+      puts "ooooooo"
+      puts pi.inspect
+      puts "ooooooo"
+
+      c = ProjectRole.all
+      puts "^^^^^^"
+      puts c.inspect
+      puts "^^^^^^"
+
+      i = Identity.all
+      puts "7777777"
+      puts i.inspect
+      puts "7777777"
     elsif search_attrs[:search_drop] == "Authorized User"
       where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
       joins(:authorized_users).
