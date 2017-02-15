@@ -26,7 +26,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
   let!(:logged_in_user) { create(:identity) }
 
   before(:each) do
-    allow(controller.request).to receive(:referrer).and_return('http://example.com')
+    allow_any_instance_of(ServiceRequestsController).to receive(:previous_page).and_return('http://example.com')
   end
 
   describe '#remove_service' do
@@ -279,7 +279,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
         @li_1     = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: @service)
                     create(:line_item, service_request: @sr, sub_service_request: @ssr1, service: @service1)
                     create(:line_item, service_request: @sr, sub_service_request: @ssr1, service: @service)
-                   
+
         @li_id = @li.id
 
         #Authorized User
@@ -306,7 +306,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
         end
 
         it 'should send notifications to the service provider' do
-          
+
           allow(Notifier).to receive(:notify_service_provider) do
             mailer = double('mail')
             expect(mailer).to receive(:deliver_now)
@@ -324,7 +324,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
         end
 
         it 'should send notifications to the admin' do
-          
+
           allow(Notifier).to receive(:notify_admin) do
             mailer = double('mail')
             expect(mailer).to receive(:deliver)
