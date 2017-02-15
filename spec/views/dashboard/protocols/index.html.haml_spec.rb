@@ -25,6 +25,7 @@ RSpec.describe 'dashboard/protocols/index', type: :view do
 
   before(:each) do
     assign(:user, jug2)
+    assign(:search_by, ['Authorized User', 'HR#', 'PI', 'Protocol', 'PRO#'])
     assign(:filterrific, double('filterrific',
       select_options: {
         with_status: [],
@@ -33,7 +34,7 @@ RSpec.describe 'dashboard/protocols/index', type: :view do
         with_owner: []
       },
       with_status: [],
-      search_query: '',
+      search_query: { search_drop: '', search_text: ''},
       show_archived: 0,
       admin_filter: "for_identity #{jug2.id}",
       with_organization: false,

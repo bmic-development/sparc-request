@@ -52,7 +52,7 @@ class Dashboard::ProtocolsController < Dashboard::BaseController
         },
         persistence_id: false #resets filters on page reload
       ) || return
-    @search_by = ['Authorized User', 'HR#', 'PI', 'Protocol', 'PRO#']
+
     @protocols        = @filterrific.find.page(params[:page])
     @admin_protocols  = Protocol.for_admin(@user.id).pluck(:id)
     @protocol_filters = ProtocolFilter.latest_for_user(@user.id, 5)
