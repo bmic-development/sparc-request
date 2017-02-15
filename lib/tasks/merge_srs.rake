@@ -1,10 +1,10 @@
 require 'progress_bar'
 
-AUDIT_COMMENT = "multiple_nexus_ssrs"
+AUDIT_COMMENT = "merge_srs"
 
-task :multiple_nexus_ssrs => :environment do
+task :merge_srs => :environment do
   ServiceRequest.skip_callback(:save, :after, :set_original_submitted_date)
-  nexus_org = 14
+  nexus_org = [2, 11, 20, 36, 63, 180]
   multiple_ssrs_fp = CSV.open("tmp/multiple_ssrs.csv", "w")
   deleted_ssrs_fp = CSV.open("tmp/deleted_ssrs.csv", "w")
 
@@ -62,15 +62,16 @@ task :multiple_nexus_ssrs => :environment do
   protocols = Protocol.joins(:sub_service_requests).where(sub_service_requests: { organization_id: nexus_org }).distinct
   bar2 = ProgressBar.new(protocols.count)
   protocols.each do |protocol|
-    # Grab all Nexus SSR's
-    nexus_ssrs = protocol.sub_service_requests.where(organization_id: nexus_org)
+    nexus_org.each do |org_id|
+      # Grab all Nexus SSR's
+      nexus_ssrs = protocol.sub_service_requests.where(organization_id: org_id)
 
-    # If there are multiple Nexus SSR's
-    if nexus_ssrs.count > 1
-      # Then something is wrong
-      raise "Protocol #{protocol.id} has multiple SSR's under Organization 14"
+      # If there are multiple Nexus SSR's
+      if nexus_ssrs.where.not(status: 'complete').count > 1
+        # Then something is wrong
+        raise "Protocol #{protocol.id} has multiple incomplete SSR's under Organizations #{org_id}"
+      end
     end
-
     delete_empty_srs(protocol)
 
     # Merge remaining service requests into service request with most recently
