@@ -188,7 +188,6 @@ class Protocol < ActiveRecord::Base
   )
 
   scope :search_query, lambda { |search_attrs|
-    puts search_attrs.inspect
     # Searches protocols based on short_title, title, id, and associated_users
     # Protects against SQL Injection with ActiveRecord::Base::sanitize
 
