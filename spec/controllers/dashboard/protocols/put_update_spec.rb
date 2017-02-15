@@ -178,7 +178,7 @@ RSpec.describe Dashboard::ProtocolsController do
           xhr :get, :update, id: @protocol.id, protocol: { title: "some value", study_phase_ids: ["#{@study_phase1.id}", "#{@study_phase2.id}"] }
         end
 
-        it 'should set @admin to true' do
+        it 'should update study phases' do
           expect(assigns(:protocol).study_phases).to eq([@study_phase1, @study_phase2])
         end
 
