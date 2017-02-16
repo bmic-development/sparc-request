@@ -197,29 +197,31 @@ class Protocol < ActiveRecord::Base
     like_search_term = ActiveRecord::Base::sanitize("%#{escaped_search_term}%")
     exact_search_term = ActiveRecord::Base::sanitize(search_attrs[:search_text])
 
-    if search_attrs[:search_drop] == "PI"
+    case search_attrs[:search_drop]
+      
+    when "PI"
       where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
       joins(:principal_investigators).
         where(where_clause.compact.join(' OR ')).
         distinct
-    elsif search_attrs[:search_drop] == "Authorized User"
+    when "Authorized User"
       where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
       joins(:authorized_users).
         joins(:identities).
         where(where_clause.compact.join(' OR ')).
         distinct
-    elsif search_attrs[:search_drop] == "Protocol"
+    when "Protocol"
       where_clause = ["protocols.short_title LIKE #{like_search_term} escape '!'",
         "protocols.title LIKE #{like_search_term} escape '!'",
         "protocols.id = #{exact_search_term}"]
       where(where_clause.compact.join(' OR ')).
         distinct
-    elsif search_attrs[:search_drop] == "HR#"
+    when "HR#"
       where_clause = ["human_subjects_info.hr_number LIKE #{like_search_term} escape '!'"]
       joins(:human_subjects_info).
         where(where_clause.compact.join(' OR ')).
         distinct
-    elsif search_attrs[:search_drop] == "PRO#"
+    when "PRO#"
       where_clause = ["human_subjects_info.pro_number LIKE #{like_search_term} escape '!'"]
       joins(:human_subjects_info).
         where(where_clause.compact.join(' OR ')).
