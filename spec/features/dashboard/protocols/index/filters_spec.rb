@@ -257,7 +257,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)   
         @page.filter_protocols.select_search(@page, "Protocol", "title")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_protocols(text: "Protocol1")
         expect(@page.search_results).to have_protocols(text: "Protocol2")
         expect(@page.search_results).to have_no_protocols(text: "Protocol3")
@@ -288,7 +287,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "Protocol", @protocol1.id.to_s)
         @page.filter_protocols.apply_filter_button.click
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_protocols(count: 1)
         expect(@page.search_results).to have_protocols(text: "Protocol1")
       end
@@ -302,7 +300,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "Protocol", "%")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_protocols(text: "title %")
         expect(@page.search_results).to have_no_protocols(text: "_Title")
         expect(@page.search_results).to have_protocols(text: "a%a")
@@ -342,7 +339,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "Authorized User", "james")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_protocols(text: "Protocol3")
@@ -353,7 +349,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "Authorized User", "Doop")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_protocols(text: "Protocol3")
@@ -364,7 +359,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "Authorized User", "Hedwig")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_no_protocols(text: "Protocol3")
@@ -426,7 +420,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "PI", "Johnbob")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_no_protocols(text: "Protocol3")
@@ -466,7 +459,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "HR#", @protocol3.human_subjects_info.hr_number)
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_protocols(text: "Protocol3")
@@ -477,7 +469,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "HR#", @protocol3.human_subjects_info.hr_number.split(//, 2).last)
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_protocols(text: "Protocol3")
@@ -488,7 +479,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "HR#", "1111111")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_no_protocols(text: "Protocol3")
@@ -528,7 +518,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "PRO#", @protocol3.human_subjects_info.pro_number)
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_protocols(text: "Protocol3")
@@ -539,7 +528,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "PRO#", @protocol3.human_subjects_info.pro_number.split(//, 2).last)
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_protocols(text: "Protocol3")
@@ -550,7 +538,6 @@ RSpec.describe "filters", js: :true do
         expect(@page.search_results).to have_protocols(count: 3)
         @page.filter_protocols.select_search(@page, "PRO#", "111111111")
         @page.filter_protocols.apply_filter_button.click()
-        wait_for_javascript_to_finish
         expect(@page.search_results).to have_no_protocols(text: "Protocol1")
         expect(@page.search_results).to have_no_protocols(text: "Protocol2")
         expect(@page.search_results).to have_no_protocols(text: "Protocol3")
