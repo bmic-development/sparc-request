@@ -33,7 +33,7 @@ RSpec.describe 'dashboard/protocols/index', type: :view do
         with_owner: []
       },
       with_status: [],
-      search_query: '',
+      search_query: { search_drop: '', search_text: ''},
       show_archived: 0,
       admin_filter: "for_identity #{jug2.id}",
       with_organization: false,
