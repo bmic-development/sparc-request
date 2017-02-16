@@ -46,6 +46,20 @@ en:
   # ACTIVERECORD #
   ################
   activerecord:
+    errors:
+      models:
+        item:
+          attributes:
+            content:
+              blank: "Content can't be blank"
+        questionnaire:
+          attributes:
+            name:
+              blank: "Name can't be blank"
+        item_option:
+          attributes:
+            content:
+              blank: "Content can't be blank"
     attributes:
       arm:
         name: "Arm Name"
@@ -130,7 +144,6 @@ en:
     rights:
       none: Member Only
       view: "View Rights"
-      request: "Request/Approve Services"
       approve: "Authorized/Change Study Charges"
     table_fields:
       name: "Full Name"
@@ -291,6 +304,8 @@ en:
       sponsor: "Sponsor Name:"
       funding_source: "Funding Source:"
       potential_source: "Potential Funding Source:"
+      research_master_id: "Research Master ID:"
+      na_research_master_id: 'Not Available'
     view_details:
       button: "View %{protocol_type} Details"
       header: "%{protocol_type} Details: #%{protocol_id}"
