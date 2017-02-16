@@ -46,6 +46,20 @@ def let_there_be_j
     )}
 end
 
+def build_study_phases
+  let!(:study_phase_1)    { StudyPhase.create(order: 1, phase: 'O', version: 1) }
+  let!(:study_phase_2)    { StudyPhase.create(order: 2, phase: 'I', version: 1) }
+  let!(:study_phase_3)    { StudyPhase.create(order: 3, phase: 'Ia', version: 1) }
+  let!(:study_phase_4)    { StudyPhase.create(order: 4, phase: 'Ib', version: 1) }
+  let!(:study_phase_5)    { StudyPhase.create(order: 5, phase: 'II', version: 1) }
+  let!(:study_phase_6)    { StudyPhase.create(order: 6, phase: 'IIa', version: 1) }  
+  let!(:study_phase_7)    { StudyPhase.create(order: 7, phase: 'IIb', version: 1) }
+  let!(:study_phase_8)    { StudyPhase.create(order: 8, phase: 'III', version: 1) }
+  let!(:study_phase_9)    { StudyPhase.create(order: 9, phase: 'IIIa', version: 1) }
+  let!(:study_phase_10)   { StudyPhase.create(order: 10, phase: 'IIIb', version: 1) }
+  let!(:study_phase_11)   { StudyPhase.create(order: 11, phase: 'IV', version: 1) }
+end
+
 def build_study_type_question_groups
   let!(:study_type_question_group_version_1)  { StudyTypeQuestionGroup.create(active: false, version: 1) }
   let!(:study_type_question_group_version_2)    { StudyTypeQuestionGroup.create(active: false, version: 2) }
