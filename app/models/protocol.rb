@@ -49,7 +49,7 @@ class Protocol < ActiveRecord::Base
 
   has_many :principal_investigators, -> { where(project_roles: { role: %w(pi primary-pi) }) },
     source: :identity, through: :project_roles
-  has_many :authorized_users, -> { where.not(project_roles: { role: %w(pi primary-pi) }) },
+  has_many :non_pi_authorized_users, -> { where.not(project_roles: { role: %w(pi primary-pi) }) },
     source: :identity, through: :project_roles
   has_many :billing_managers, -> { where(project_roles: { role: 'business-grants-manager' }) },
     source: :identity, through: :project_roles
@@ -200,31 +200,27 @@ class Protocol < ActiveRecord::Base
     case search_attrs[:search_drop]
       
     when "PI"
-      where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
       joins(:principal_investigators).
-        where(where_clause.compact.join(' OR ')).
+        where("CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'").
         distinct
     when "Authorized User"
-      where_clause = ["CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'"]
-      joins(:authorized_users).
+      joins(:non_pi_authorized_users).
         joins(:identities).
-        where(where_clause.compact.join(' OR ')).
+        where("CONCAT(identities.first_name, ' ', identities.last_name) LIKE #{like_search_term} escape '!'").
         distinct
     when "Protocol"
       where_clause = ["protocols.short_title LIKE #{like_search_term} escape '!'",
         "protocols.title LIKE #{like_search_term} escape '!'",
         "protocols.id = #{exact_search_term}"]
-      where(where_clause.compact.join(' OR ')).
+      where(where_clause.join(' OR ')).
         distinct
     when "HR#"
-      where_clause = ["human_subjects_info.hr_number LIKE #{like_search_term} escape '!'"]
       joins(:human_subjects_info).
-        where(where_clause.compact.join(' OR ')).
+        where("human_subjects_info.hr_number LIKE #{like_search_term} escape '!'").
         distinct
     when "PRO#"
-      where_clause = ["human_subjects_info.pro_number LIKE #{like_search_term} escape '!'"]
       joins(:human_subjects_info).
-        where(where_clause.compact.join(' OR ')).
+        where("human_subjects_info.pro_number LIKE #{like_search_term} escape '!'").
         distinct
     end
   }

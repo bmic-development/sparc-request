@@ -25,7 +25,6 @@ RSpec.describe 'dashboard/protocols/index', type: :view do
 
   before(:each) do
     assign(:user, jug2)
-    assign(:search_by, ['Authorized User', 'HR#', 'PI', 'Protocol', 'PRO#'])
     assign(:filterrific, double('filterrific',
       select_options: {
         with_status: [],
