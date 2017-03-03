@@ -36,12 +36,12 @@ class ModifySurveyColumns < ActiveRecord::Migration
     # If tables don't exist, #
     # create mock tables     #
     ####################################################################################
-    unless ActiveRecord::Base.connection.table_exists? 'surveys'
+    unless ActiveRecord::Base.connection.table_exists? 'surveys' do
       create_table :surveys do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'survey_translations'
+    unless ActiveRecord::Base.connection.table_exists? 'survey_translations' do
       create_table :survey_translations do |t|
       end
     end
