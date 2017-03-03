@@ -1,5 +1,97 @@
 class ModifySurveyColumns < ActiveRecord::Migration
   def up
+    ##########################
+    # For Travis:            #
+    # If tables don't exist, #
+    # create mock tables and #
+    # models                 #
+    ####################################################################################
+    unless ActiveRecord::Base.connection.table_exists? 'surveys'
+      create_table :surveys do |t|
+      end
+
+      class Survey < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'survey_translations'
+      create_table :survey_translations do |t|
+      end
+
+      class SurveyTranslation < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'survey_sections' do
+      create_table :survey_sections do |t|
+      end
+
+      class SurveySection < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'question_groups' do
+      create_table :question_groups do |t|
+      end
+
+      class QuestionGroup < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'questions' do
+      create_table :questions do |t|
+      end
+
+      class Question < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'answers' do
+      create_table :answers do |t|
+      end
+
+      class Answer < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'response_sets' do
+      create_table :response_sets do |t|
+      end
+
+      class ResponseSet < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'responses' do
+      create_table :responses do |t|
+      end
+
+      class Response < ActiveRecord::Base
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'dependencies' do
+      create_table :responses do |t|
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'dependency_conditions' do
+      create_table :responses do |t|
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'validations' do
+      create_table :responses do |t|
+      end
+    end
+
+    unless ActiveRecord::Base.connection.table_exists? 'validation_conditions' do
+      create_table :responses do |t|
+      end
+    end
+
+
+
     puts "Fixing surveyor models..."
     ###################
     # Gather all data #
@@ -32,6 +124,10 @@ class ModifySurveyColumns < ActiveRecord::Migration
     drop_table :answers
     drop_table :response_sets
     drop_table :responses
+    drop_table :dependencies
+    drop_table :dependency_conditions
+    drop_table :validations
+    drop_table :validation_conditions
 
 
 
