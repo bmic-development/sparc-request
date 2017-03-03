@@ -269,7 +269,7 @@ class ModifySurveyColumns < ActiveRecord::Migration
             question_id: corresponding_question_ids["#{response.question_id}"],
             response_id: new_response.id,
             content:     get_question_response_content(options.detect{|a| a.id == response.answer_id}, response),
-            required:    question.detect{|q| q.id == response.question_id}.required
+            required:    question.detect{|q| q.id == response.question_id}.required,
             created_at:  response.created_at,
             updated_at:  response.updated_at
           })
