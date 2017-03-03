@@ -77,22 +77,22 @@ class ModifySurveyColumns < ActiveRecord::Migration
     end
 
     unless ActiveRecord::Base.connection.table_exists?('dependencies')
-      create_table :responses do |t|
+      create_table :dependencies do |t|
       end
     end
 
     unless ActiveRecord::Base.connection.table_exists?('dependency_conditions')
-      create_table :responses do |t|
+      create_table :dependency_conditions do |t|
       end
     end
 
     unless ActiveRecord::Base.connection.table_exists?('validations')
-      create_table :responses do |t|
+      create_table :validations do |t|
       end
     end
 
     unless ActiveRecord::Base.connection.table_exists?('validation_conditions')
-      create_table :responses do |t|
+      create_table :validation_conditions do |t|
       end
     end
 
