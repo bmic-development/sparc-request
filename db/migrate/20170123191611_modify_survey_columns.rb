@@ -36,62 +36,62 @@ class ModifySurveyColumns < ActiveRecord::Migration
     # If tables don't exist, #
     # create mock tables     #
     ####################################################################################
-    unless ActiveRecord::Base.connection.table_exists? 'surveys' do
+    unless ActiveRecord::Base.connection.table_exists?('surveys')
       create_table :surveys do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'survey_translations' do
+    unless ActiveRecord::Base.connection.table_exists?('survey_translations')
       create_table :survey_translations do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'survey_sections' do
+    unless ActiveRecord::Base.connection.table_exists?('survey_sections')
       create_table :survey_sections do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'question_groups' do
+    unless ActiveRecord::Base.connection.table_exists?('question_groups')
       create_table :question_groups do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'questions' do
+    unless ActiveRecord::Base.connection.table_exists?('questions')
       create_table :questions do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'answers' do
+    unless ActiveRecord::Base.connection.table_exists?('answers')
       create_table :answers do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'response_sets' do
+    unless ActiveRecord::Base.connection.table_exists?('response_sets')
       create_table :response_sets do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'responses' do
+    unless ActiveRecord::Base.connection.table_exists?('responses')
       create_table :responses do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'dependencies' do
+    unless ActiveRecord::Base.connection.table_exists?('dependencies')
       create_table :responses do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'dependency_conditions' do
+    unless ActiveRecord::Base.connection.table_exists?('dependency_conditions')
       create_table :responses do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'validations' do
+    unless ActiveRecord::Base.connection.table_exists?('validations')
       create_table :responses do |t|
       end
     end
 
-    unless ActiveRecord::Base.connection.table_exists? 'validation_conditions' do
+    unless ActiveRecord::Base.connection.table_exists?('validation_conditions')
       create_table :responses do |t|
       end
     end
