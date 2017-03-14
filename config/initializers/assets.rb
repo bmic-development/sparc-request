@@ -64,3 +64,11 @@ Rails.application.config.assets.precompile += %w( system_satisfaction.css )
 Rails.application.config.assets.precompile += %w( system_satisfaction.js )
 Rails.application.config.assets.precompile += %w( view_details.css )
 Rails.application.config.assets.precompile += %w( additional_details/styles/document_table.css )
+Rails.application.config.assets.precompile += %w( surveyor/jquery-1.9.0.js )
+Rails.application.config.assets.precompile += %w( surveyor/jquery-ui-1.10.0.custom.js )
+Rails.application.config.assets.precompile += %w( surveyor/jquery-ui-timepicker-addon.js )
+Rails.application.config.assets.precompile += %w( surveyor/jquery.selectToUISlider.js )
+Rails.application.config.assets.precompile += %w( surveyor/jquery.surveyor.js )
+Rails.application.config.assets.precompile += %w( surveyor/jquery.maskedinput.js )
+
+
