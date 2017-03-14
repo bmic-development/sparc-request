@@ -70,5 +70,3 @@ Rails.application.config.assets.precompile += %w( surveyor/jquery-ui-timepicker-
 Rails.application.config.assets.precompile += %w( surveyor/jquery.selectToUISlider.js )
 Rails.application.config.assets.precompile += %w( surveyor/jquery.surveyor.js )
 Rails.application.config.assets.precompile += %w( surveyor/jquery.maskedinput.js )
-
-
