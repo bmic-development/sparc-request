@@ -55,6 +55,7 @@ gem 'rails', '~> 5.0.0'
 gem 'rails-html-sanitizer'
 # Needed to used audited-activerecord w/ Rails 5
 gem "rails-observers", github: 'rails/rails-observers'
+gem 'record_tag_helper', '~> 1.0'
 gem 'redcarpet'
 gem 'remotipart'
 gem 'rest-client'
