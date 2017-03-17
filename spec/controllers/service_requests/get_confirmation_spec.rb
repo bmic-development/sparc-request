@@ -63,7 +63,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
     #  Scenario: You have an existing SR, you add a new service that creates a new SSR (0004), you then delete this same service (therefore deleting the SSR), you then (because you are in indecisive user) decide to add said service back AGAIN (0005).  You then go through the app to resubmit
     # Result: authorized users should receive a request amendment email with the service being added(and it should have the number of the last added service- 0005). SP and Admin should receive an initial submit
     context 'previously submitted SR and SSR' do
-      context 'add line item to new SSR, then immediately delete before resubmitting' do
+      context 'add line item to new SSR, delete said line_item (therefore deleting SSR), and then add the same service creating a new SSR once again and resubmit' do
         before :each do
 
           # SR

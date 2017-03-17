@@ -304,6 +304,7 @@ class SubServiceRequest < ActiveRecord::Base
   ########################
   ## SSR STATUS METHODS ##
   ########################
+
   def update_status(new_status, submit=false)
     to_notify = []
     if can_be_edited?
@@ -311,13 +312,19 @@ class SubServiceRequest < ActiveRecord::Base
       editable = EDITABLE_STATUSES[organization_id] || available
       changeable = available & editable
       if changeable.include?(new_status)
-        if (status != new_status) && (UPDATABLE_STATUSES.include?(status) || !submit)
-          update_attribute(:status, new_status)
+        if (status != new_status) && UPDATABLE_STATUSES.include?(status)
+          past_status = PastStatus.where(sub_service_request_id: id).last
           if new_status == 'submitted'
-            to_notify << id unless previously_submitted?
+            if status == 'draft' && (UPDATABLE_STATUSES.include?(past_status) || past_status == nil)
+              to_notify << id
+            elsif status != 'draft'
+              to_notify << id 
+            end
+            update_attributes(submitted_at: Time.now, nursing_nutrition_approved: false, lab_approved: false, imaging_approved: false, committee_approved: false)
           else
             to_notify << id
           end
+          update_attribute(:status, new_status)
         end
       end
     end
@@ -482,6 +489,43 @@ class SubServiceRequest < ActiveRecord::Base
   def audit_label audit
     "Service Request #{display_id}"
   end
+
+  def audit_line_items(identity)
+    filtered_audit_trail = {:line_items => []}
+
+    ssr_submitted_at_audit = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{self.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update') AND user_id = #{identity.id}").order(created_at: :desc).first
+    poop = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{self.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update') AND user_id = #{identity.id}").order(created_at: :desc)
+    start_date = !ssr_submitted_at_audit.nil? ? ssr_submitted_at_audit.audited_changes['submitted_at'].first : Time.now.utc
+    end_date = Time.now.utc
+
+    deleted_line_item_audits = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{self.id}%' AND
+                                      auditable_type = 'LineItem' AND user_id = #{identity.id} AND action IN ('destroy') AND
+                                      created_at BETWEEN '#{start_date}' AND '#{end_date}'")
+                             
+    added_line_item_audits = AuditRecovery.where("audited_changes LIKE '%service_request_id: #{self.service_request.id}%' AND
+                                      auditable_type = 'LineItem' AND user_id = #{identity.id} AND action IN ('create') AND
+                                      created_at BETWEEN '#{start_date}' AND '#{end_date}'")
+    
+    auditable_ids = !added_line_item_audits.empty? ? added_line_item_audits.map(&:auditable_id) : []
+    li_ids = !line_items.empty? ? line_items.map(&:id) : []
+    added_lis = auditable_ids & li_ids
+
+    if !added_lis.empty?
+      added_lis.each do |li_id|
+        filtered_audit_trail[:line_items] << added_line_item_audits.where(auditable_id: li_id).first
+      end
+    end
+
+    if !deleted_line_item_audits.empty?
+      deleted_line_item_audits.each do |deleted_li|
+        filtered_audit_trail[:line_items] << deleted_li
+      end
+    end
+
+    filtered_audit_trail[:sub_service_request_id] = self.id
+    filtered_audit_trail
+  end
+
 
   # filtered audit trail based off service requests and only return data that we need
   # in future may want to return full filtered audit trail, currently this is only used in e-mailing service providers

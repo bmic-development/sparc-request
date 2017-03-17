@@ -312,16 +312,21 @@ class ServiceRequest < ActiveRecord::Base
         groupings[last_parent] = {:process_ssr_organization_name => last_parent_name, :name => name.reverse.join(' > '), :services => [service], :line_items => [line_item], :acks => acks.reverse.uniq.compact}
       end
     end
-
     groupings
   end
 
-  def deleted_ssrs_since_previous_submission
-    AuditRecovery.where("audited_changes LIKE '%service_request_id: #{id}%' AND auditable_type = 'SubServiceRequest' AND action = 'destroy' AND created_at BETWEEN '#{previous_submitted_at.utc}' AND '#{Time.now.utc}'")
+  def deleted_ssrs_since_previous_submission(start_time_at_previous_sub_time=false)
+    if start_time_at_previous_sub_time
+      start_time = previous_submitted_at.nil? ? Time.now.utc : previous_submitted_at.utc
+    else
+      start_time = submitted_at.nil? ? Time.now.utc : submitted_at.utc
+    end
+    AuditRecovery.where("audited_changes LIKE '%service_request_id: #{id}%' AND auditable_type = 'SubServiceRequest' AND action = 'destroy' AND created_at BETWEEN '#{start_time}' AND '#{Time.now.utc}'")
   end
 
   def created_ssrs_since_previous_submission
-    AuditRecovery.where("audited_changes LIKE '%service_request_id: #{id}%' AND auditable_type = 'SubServiceRequest' AND action = 'create' AND created_at BETWEEN '#{previous_submitted_at.utc}' AND '#{Time.now.utc}'")
+    start_time = submitted_at.nil? ? Time.now.utc : submitted_at.utc
+    AuditRecovery.where("audited_changes LIKE '%service_request_id: #{id}%' AND auditable_type = 'SubServiceRequest' AND action = 'create' AND created_at BETWEEN '#{start_time}' AND '#{Time.now.utc}'")
   end
 
   def previously_submitted_ssrs
@@ -432,7 +437,7 @@ class ServiceRequest < ActiveRecord::Base
 
   # Change the status of the service request and all the sub service
   # requests to the given status.
-  def update_status(new_status, use_validation=true, submit=false)
+  def update_status(new_status, use_validation=true)
     to_notify = []
     self.assign_attributes(status: new_status)
 
@@ -443,14 +448,22 @@ class ServiceRequest < ActiveRecord::Base
       changeable = available & editable
 
       if changeable.include?(new_status)
-        if (ssr.status != new_status) && (UPDATABLE_STATUSES.include?(ssr.status) || !submit)
-          ssr.update_attribute(:status, new_status)
-          # Do not notify (initial submit email) if ssr has been previously submitted
+        if (ssr.status != new_status) && UPDATABLE_STATUSES.include?(ssr.status)
+          # If the new status is 'submitted' and the old status is 'draft', we need to figure out if this SSR is coming from an updatable_status or not.
+
+          # Scenario for status change to 'submitted':  A user goes through to modify a SR and actually adds/removes services, the status of that SSR is changed to 'draft' from whatever status it was previously.  In this case, we would want to send a request amendment email NOT an initial submission email.  However, if we are creating a new request, all of those SSRs will have a status of 'draft' that have never been submitted before (past_status == nil), we would want that initial submission email and not the request amendment email.  Also if we are coming from an updatable_status such as 'get_a_cost_estimate', we want an initial submission email EVEN IF this SSR has been submitted before.
+          past_status = PastStatus.where(sub_service_request_id: ssr.id).last
           if new_status == 'submitted'
-            to_notify << ssr.id unless ssr.previously_submitted?
+            if ssr.status == 'draft' && (UPDATABLE_STATUSES.include?(past_status) || past_status == nil) # past_status == nil indicates a newly created SSR
+              to_notify << ssr.id
+            elsif ssr.status != 'draft'
+              to_notify << ssr.id 
+            end
+            ssr.update_attributes(submitted_at: Time.now, nursing_nutrition_approved: false, lab_approved: false, imaging_approved: false, committee_approved: false)
           else
             to_notify << ssr.id
           end
+          ssr.update_attribute(:status, new_status)
         end
       end
     end
@@ -517,6 +530,18 @@ class ServiceRequest < ActiveRecord::Base
 
   def arms_editable?
     true #self.sub_service_requests.all?{|ssr| ssr.arms_editable?}
+  end
+
+  def audit_all_line_items(identity)
+    filtered_audit_trail = {:line_items => []}
+    sub_service_requests.each do |ssr|
+      ssr_line_item_audit = ssr.audit_line_items(identity)
+      if !ssr_line_item_audit.nil?
+        filtered_audit_trail[:line_items] << ssr_line_item_audit[:line_items]
+      end
+    end
+
+    filtered_audit_trail[:line_items].flatten
   end
 
   def audit_report( identity, start_date=self.previous_submitted_at.utc, end_date=Time.now.utc )

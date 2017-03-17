@@ -32,26 +32,68 @@ RSpec.describe NotifierLogic do
   context '#send_request_amendment_email_evaluation' do
     context 'deleted an entire SSR and resubmit SR' do
       before :each do
-         @org         = create(:organization_with_process_ssrs)
+        ### SR SETUP ###
+        ### PREVIOUSLY SUBMITTED SSR ###
+        @org         = create(:organization_with_process_ssrs)
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
-        @ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: nil)
+        ### SSR SETUP ###
+        @ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'submitted', submitted_at: Time.now.yesterday.utc)
         @ssr2        = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'submitted', submitted_at: Time.now.yesterday.utc)
+        ### LINE ITEM SETUP ###
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
                       create(:service_provider, identity: logged_in_user, organization: @org)
-                      
+        ### DELETE LINE ITEM WHICH IN TURNS DELETES SSR ###
+        # mimics the service_requests_controller remove_service method
+        @destroyed_li_id = li.id
+        li.destroy
+        @ssr.update_attribute(:status, 'draft')
         @ssr.destroy
         @sr.reload
-        audit = AuditRecovery.where("auditable_id = '#{li.id}' AND auditable_type = 'LineItem' AND action = 'destroy'")
-        audit.first.update_attribute(:created_at, Time.now.utc - 5.hours)
-        audit.first.update_attribute(:user_id, logged_in_user.id)
 
-        audit_of_ssr = AuditRecovery.where("auditable_id = '#{@ssr.id}' AND auditable_type = 'SubServiceRequest' AND action = 'destroy'")
-        audit_of_ssr.first.update_attribute(:created_at, Time.now.utc - 5.hours)
-        audit_of_ssr.first.update_attribute(:user_id, logged_in_user.id)
+        ### Setting up audits for emails ###
+        ### Changing time for the created_at, so this SSR does not show up in audit ###
+        audit_of_ssr_create = AuditRecovery.where("auditable_id = '#{@ssr.id}' AND auditable_type = 'SubServiceRequest' AND action = 'create'")
+        audit_of_ssr_create.first.update_attribute(:created_at, Time.now.yesterday.utc - 5.hours)
+
+        audit_of_ssr2_create = AuditRecovery.where("auditable_id = '#{@ssr2.id}' AND auditable_type = 'SubServiceRequest' AND action = 'create'")
+        audit_of_ssr2_create.first.update_attribute(:created_at, Time.now.yesterday.utc - 5.hours)
+
+        ### Deleted SSRs since previously submitted ###
+        deleted_ssrs_since_previous_submission = AuditRecovery.where("audited_changes LIKE '%service_request_id: #{@sr.id}%' AND auditable_type = 'SubServiceRequest' AND action = 'destroy' AND created_at BETWEEN '#{Time.now.yesterday.utc}' AND '#{Time.now.utc}'")
+        deleted_ssrs_since_previous_submission.first.update_attribute(:created_at, Time.now.utc - 5.hours)
+        deleted_ssrs_since_previous_submission.first.update_attribute(:user_id, logged_in_user.id)
+        ### Change last status to an 'unupdatable' status ###
+        destroyed_ssr = AuditRecovery.where("auditable_id = #{@ssr.id} AND action = 'update'").order(created_at: :desc).first
+        destroyed_ssr.update_attributes(audited_changes: {'status'=>["submitted", "blah"]} )
+        ### Deleted LIs since previously submitted ###
+        deleted_li = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{@ssr.id}%' AND auditable_type = 'LineItem' AND action IN ('destroy')")
+        deleted_li.first.update_attribute(:created_at, Time.now.utc - 5.hours)
+        deleted_li.first.update_attribute(:user_id, logged_in_user.id)
+
         @sr.previous_submitted_at = @sr.submitted_at
+
+
+
+
+        # audit = AuditRecovery.where("auditable_id = '#{@destroyed_li_id}' AND auditable_type = 'LineItem' AND action = 'destroy'")
+        # audit.first.update_attribute(:created_at, Time.now.utc - 5.hours)
+        # audit.first.update_attribute(:user_id, logged_in_user.id)
+
+        # audit_of_ssr_create = AuditRecovery.where("auditable_id = '#{@ssr.id}' AND auditable_type = 'SubServiceRequest' AND action = 'create'")
+        # audit_of_ssr_create.first.update_attribute(:created_at, Time.now.yesterday.utc - 5.hours)
+
+        # audit_of_ssr_destroy = AuditRecovery.where("auditable_id = '#{@ssr.id}' AND auditable_type = 'SubServiceRequest' AND action = 'destroy'")
+        # audit_of_ssr_destroy.first.update_attribute(:created_at, Time.now.utc - 5.hours)
+        # audit_of_ssr_destroy.first.update_attribute(:user_id, logged_in_user.id)
+        # destroyed_ssr = AuditRecovery.where("auditable_id = #{@ssr.id} AND action = 'update'").order(created_at: :desc).first
+        # destroyed_ssr.update_attributes(audited_changes: {'status'=>["submitted", "blah"]} )
+        # @sr.previous_submitted_at = @sr.submitted_at
+      end
+
+      def delete_entire_ssr
       end
 
       it 'should notify authorized users' do
@@ -146,11 +188,13 @@ RSpec.describe NotifierLogic do
         audit.first.update_attribute(:user_id, logged_in_user.id)
 
         ssr_li_id   = @ssr.line_items.first.id
+        #Mimics remove_service method on service_requests_controller
+        @ssr.update_attribute(:status, 'draft')
         @ssr.line_items.first.destroy!
 
-        audit_1 = AuditRecovery.where("auditable_id = '#{ssr_li_id}' AND auditable_type = 'LineItem' AND action = 'destroy'")
-        audit_1.first.update_attribute(:created_at, Time.now - 5.hours)
-        audit_1.first.update_attribute(:user_id, logged_in_user.id)
+        audit_destroy = AuditRecovery.where("auditable_id = '#{ssr_li_id}' AND auditable_type = 'LineItem' AND action = 'destroy'")
+        audit_destroy.first.update_attribute(:created_at, Time.now - 5.hours)
+        audit_destroy.first.update_attribute(:user_id, logged_in_user.id)
 
         @previously_submitted_ssrs = @sr.sub_service_requests.where.not(submitted_at: nil).to_a
         @sr.previous_submitted_at = @sr.submitted_at
@@ -169,7 +213,7 @@ RSpec.describe NotifierLogic do
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday)
-        @ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'submitted', submitted_at: Time.now.yesterday)
+        @ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: Time.now.yesterday)
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
                       create(:service_provider, identity: logged_in_user, organization: @org)
@@ -196,7 +240,7 @@ RSpec.describe NotifierLogic do
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
-        @ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'submitted', submitted_at: Time.now.yesterday.utc)
+        @ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: Time.now.yesterday.utc)
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
                       create(:service_provider, identity: logged_in_user, organization: @org)
@@ -214,5 +258,16 @@ RSpec.describe NotifierLogic do
         @notifier_logic.send_request_amendment_email_evaluation 
       end
     end
+  end
+
+  
+
+  def add_li_adding_a_new_ssr
+  end
+
+  def add_li_to_exisiting_ssr
+  end
+
+  def delete_li_from_exisiting_ssr
   end
 end
