@@ -35,7 +35,8 @@ RSpec.describe Dashboard::MultipleLineItemsController do
       @protocol = create(:protocol_without_validations)
       @page_hash = "test page hash"
       @schedule_tab = "test schedule tab"
-      xhr :get, :new_line_items, service_request_id: @service_request.id,
+      xhr :get, :new_line_items, 
+          service_request_id: @service_request.id,
           sub_service_request_id: @sub_service_request.id,
           protocol_id: @protocol.id,
           page_hash: @page_hash,
@@ -51,7 +52,7 @@ RSpec.describe Dashboard::MultipleLineItemsController do
     end
 
     it 'assigns sub service request' do
-      expect(assigns(:sub_service_request).id).to eq(@sub_service_request.id)
+      expect(assigns(:sub_service_request)).to eq(@sub_service_request)
     end
 
     it 'assigns protocol' do
