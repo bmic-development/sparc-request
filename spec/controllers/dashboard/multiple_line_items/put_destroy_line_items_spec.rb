@@ -22,53 +22,44 @@ require 'rails_helper'
 
 RSpec.describe Dashboard::MultipleLineItemsController do
   
-   describe 'GET #new_line_items' do
+   describe 'PUT #destroy_line_items' do
 
     before(:each) do
       log_in_dashboard_identity(obj: build_stubbed(:identity))
       @service_request = create(:service_request_without_validations)
-      @sub_service_request = findable_stub(SubServiceRequest) do 
-        build_stubbed(:sub_service_request, service_request: @service_request)
-      end
-      @services = create_list(:service, 3)
-      allow(@sub_service_request).to receive(:candidate_services){@services}
-      @protocol = create(:protocol_without_validations)
-      @page_hash = "test page hash"
-      @schedule_tab = "test schedule tab"
-      xhr :get, :new_line_items, 
-          service_request_id: @service_request.id,
-          sub_service_request_id: @sub_service_request.id,
-          protocol_id: @protocol.id,
-          page_hash: @page_hash,
-          schedule_tab: @schedule_tab
+      @service = create(:service)
+      organization    = create(:organization, process_ssrs: true)
+      protocol        = create(:protocol_without_validations)
+      @sub_service_request = create(:sub_service_request_without_validations,
+                              organization: organization,
+                              service_request: @service_request,
+                              status: 'draft',
+                              protocol: protocol)
+
+      @line_items = create_list(:per_patient_per_visit_line_item, 3,
+                                 service: @service, 
+                                 quantity: 1, 
+                                 service_request: @service_request, 
+                                 sub_service_request: @sub_service_request)
+
+      allow(@sub_service_request).to receive(:candidate_services){ @services }
     end
 
-    it 'responds with 200' do
-      expect(response.status).to eq(200)
+    it 'deletes the line items from the sub service request' do
+      expect{ xhr :put, :destroy_line_items, 
+                        service_request_id: @service_request.id,
+                        sub_service_request_id: @sub_service_request.id,
+                        remove_service_id: @service.id
+                        }.to change{ @sub_service_request.line_items.count }.from(3).to(0)
     end
 
-    it 'assigns service request' do
-      expect(assigns(:service_request)).to eq(@service_request)
-    end
+    it 'shows the correct flash message' do
+      xhr :put, :destroy_line_items, 
+                service_request_id: @service_request.id,
+                sub_service_request_id: @sub_service_request.id,
+                remove_service_id: @service.id
 
-    it 'assigns sub service request' do
-      expect(assigns(:sub_service_request)).to eq(@sub_service_request)
-    end
-
-    it 'assigns protocol' do
-      expect(assigns(:protocol)).to eq(@protocol)
-    end
-
-    it 'assigns services' do
-      expect(assigns(:services)).to eq(@services)
-    end
-
-    it 'assigns page hash' do
-      expect(assigns(:page_hash)).to eq(@page_hash)
-    end
-
-    it 'assigns schedule tab' do
-      expect(assigns(:study_tab)).to eq(@study_tab)
+      expect(flash.now[:alert]).to eq("Services Removed!")
     end
   end
 end
