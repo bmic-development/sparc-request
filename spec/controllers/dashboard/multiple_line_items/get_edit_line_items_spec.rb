@@ -22,29 +22,25 @@ require 'rails_helper'
 
 RSpec.describe Dashboard::MultipleLineItemsController do
   
-   describe 'GET #new_line_items' do
+   describe 'GET #edit_line_items' do
 
-    before(:all) do
+    before(:each) do
       log_in_dashboard_identity(obj: build_stubbed(:identity))
       @service_request = create(:service_request_without_validations)
+      @service = create(:service)
+      @line_items = create_list(:line_item_without_validations, 3, service: @service)
       @sub_service_request = findable_stub(SubServiceRequest) do 
-        build_stubbed(:sub_service_request, service_request: @service_request)
+        build_stubbed(:sub_service_request, service_request: @service_request, line_items: @line_items)
       end
-      @services = create_list(:service, 3)
       allow(@sub_service_request).to receive(:candidate_services){@services}
-      @protocol = create(:protocol_without_validations)
-      @page_hash = "test page hash"
-      @schedule_tab = "test schedule tab"
-      xhr :get, :new_line_items, 
+      @arm = create(:arm_without_validations)
+      @protocol = create(:protocol_without_validations, arms: [ @arm ])
+      @arm.update_attributes(line_item_visits: create_list(:line_item_visits_without_validations, 1, line_item: @line_items.first, subject_count: 1, arm: @arm), subject_count: 1, protocol: @protocol)
+      xhr :get, :edit_line_items, 
           service_request_id: @service_request.id,
           sub_service_request_id: @sub_service_request.id,
           protocol_id: @protocol.id,
-          page_hash: @page_hash,
-          schedule_tab: @schedule_tab
-    end
-
-    it 'responds with 200' do
-      expect(response.status).to eq(200)
+          service_id: @service.id
     end
 
     it 'assigns service request' do
@@ -59,16 +55,16 @@ RSpec.describe Dashboard::MultipleLineItemsController do
       expect(assigns(:protocol)).to eq(@protocol)
     end
 
-    it 'assigns services' do
-      expect(assigns(:services)).to eq(@services)
+    it 'assigns the services array' do
+      expect(assigns(:all_services)).to eq(@sub_service_request.line_items.map(&:service).uniq)
     end
 
-    it 'assigns page hash' do
-      expect(assigns(:page_hash)).to eq(@page_hash)
+    it 'assigns service given the service id' do
+      expect(assigns(:service)).to eq(@service)
     end
 
-    it 'assigns schedule tab' do
-      expect(assigns(:study_tab)).to eq(@study_tab)
+    it 'assigns arms' do
+      expect(assigns(:arms)).to eq([@arm])
     end
   end
 end
