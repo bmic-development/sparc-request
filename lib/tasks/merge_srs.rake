@@ -6,31 +6,31 @@ task :merge_srs => :environment do
   ServiceRequest.skip_callback(:save, :after, :set_original_submitted_date)
   nexus_org = [2, 11, 20, 36, 63, 180]
   multiple_ssrs_fp = CSV.open("tmp/multiple_ssrs.csv", "w")
-  deleted_ssrs_fp = CSV.open("tmp/deleted_ssrs.csv", "w")
+  # deleted_ssrs_fp = CSV.open("tmp/deleted_ssrs.csv", "w")
 
   multiple_ssrs_fp << ['Protocol ID', 'short title', 'ssr_id', 'Organization ID', 'Organization Name', 'SSR status', 'SSR pushed to Fulfillment?', 'SR ID', 'SR Submission date']
-  deleted_ssrs_fp << ['Protocol ID', 'short title', 'ssr_id', 'Organization ID', 'Organization Name', 'SSR status', 'SSR pushed to Fulfillment?', 'SR ID', 'SR Submission date']
+  # deleted_ssrs_fp << ['Protocol ID', 'short title', 'ssr_id', 'Organization ID', 'Organization Name', 'SSR status', 'SSR pushed to Fulfillment?', 'SR ID', 'SR Submission date']
 
   # For each Protocol that has a Nexus SSR
   protocols = Protocol.joins(:sub_service_requests).where(sub_service_requests: { organization_id: nexus_org }).distinct
   bar1 = ProgressBar.new(protocols.count)
   protocols.each do |protocol|
     # Grab all Nexus SSR's
-    nexus_ssrs = protocol.sub_service_requests.where(organization_id: nexus_org)
+    # nexus_ssrs = protocol.sub_service_requests.where(organization_id: nexus_org)
 
     # If there are multiple Nexus SSR's
-    if nexus_ssrs.count > 1
-      # Delete all (first_)draft Nexus SSR's in this Protocol after logging them
-      protocol.sub_service_requests.where(status: ['draft', 'first_draft'], organization_id: nexus_org).each do |ssr|
-        begin
-          ActiveRecord::Base.transaction do
-            ssr.destroy
-            deleted_ssrs_fp << [protocol.id, protocol.short_title, ssr.ssr_id, ssr.organization_id, ssr.organization.name, ssr.status, ssr.in_work_fulfillment?, ssr.service_request_id, ssr.service_request.submitted_at]
-          end
-        rescue
-        end
-      end
-    end
+    # if nexus_ssrs.count > 1
+    #   # Delete all (first_)draft Nexus SSR's in this Protocol after logging them
+    #   protocol.sub_service_requests.where(status: ['draft', 'first_draft'], organization_id: nexus_org).each do |ssr|
+    #     begin
+    #       ActiveRecord::Base.transaction do
+    #         ssr.destroy
+    #         deleted_ssrs_fp << [protocol.id, protocol.short_title, ssr.ssr_id, ssr.organization_id, ssr.organization.name, ssr.status, ssr.in_work_fulfillment?, ssr.service_request_id, ssr.service_request.submitted_at]
+    #       end
+    #     rescue
+    #     end
+    #   end
+    # end
 
     # Reload Nexus SSR's
     nexus_ssrs = protocol.sub_service_requests.where(organization_id: nexus_org)
@@ -53,7 +53,7 @@ task :merge_srs => :environment do
   end
 
   multiple_ssrs_fp.close
-  deleted_ssrs_fp.close
+  # deleted_ssrs_fp.close
 
   cant_delete_fp = CSV.open("tmp/multiple_ssrs_cant_delete.csv", "w")
   cant_delete_fp << ['Service Request ID']
