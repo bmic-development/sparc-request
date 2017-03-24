@@ -494,21 +494,18 @@ class SubServiceRequest < ActiveRecord::Base
     filtered_audit_trail = {:line_items => []}
 
     ssr_submitted_at_audit = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{self.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update') AND user_id = #{identity.id}").order(created_at: :desc).first
-    poop = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{self.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update') AND user_id = #{identity.id}").order(created_at: :desc)
+    #    start_date = !ssr_submitted_at_audit.nil? && !ssr_submitted_at_audit.audited_changes['submitted_at'].first.nil? ? ssr_submitted_at_audit.audited_changes['submitted_at'].first : Time.now.utc
     start_date = !ssr_submitted_at_audit.nil? ? ssr_submitted_at_audit.audited_changes['submitted_at'].first : Time.now.utc
     end_date = Time.now.utc
 
-    deleted_line_item_audits = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{self.id}%' AND
-                                      auditable_type = 'LineItem' AND user_id = #{identity.id} AND action IN ('destroy') AND
-                                      created_at BETWEEN '#{start_date}' AND '#{end_date}'")
+    deleted_line_item_audits = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{self.id}%' AND auditable_type = 'LineItem' AND user_id = #{identity.id} AND action IN ('destroy') AND created_at BETWEEN '#{start_date}' AND '#{end_date}'")
                              
-    added_line_item_audits = AuditRecovery.where("audited_changes LIKE '%service_request_id: #{self.service_request.id}%' AND
-                                      auditable_type = 'LineItem' AND user_id = #{identity.id} AND action IN ('create') AND
-                                      created_at BETWEEN '#{start_date}' AND '#{end_date}'")
-    
-    auditable_ids = !added_line_item_audits.empty? ? added_line_item_audits.map(&:auditable_id) : []
-    li_ids = !line_items.empty? ? line_items.map(&:id) : []
-    added_lis = auditable_ids & li_ids
+    added_line_item_audits = AuditRecovery.where("audited_changes LIKE '%service_request_id: #{self.service_request.id}%' AND auditable_type = 'LineItem' AND user_id = #{identity.id} AND action IN ('create') AND created_at BETWEEN '#{start_date}' AND '#{end_date}'")
+
+    ### Takes all the added LIs and filters them down to the ones specific to this SSR ###
+    added_li_ids = !added_line_item_audits.empty? ? added_line_item_audits.map(&:auditable_id) : []
+    li_ids_added_to_this_ssr = !line_items.empty? ? line_items.map(&:id) : []
+    added_lis = added_li_ids & li_ids_added_to_this_ssr
 
     if !added_lis.empty?
       added_lis.each do |li_id|
@@ -521,7 +518,6 @@ class SubServiceRequest < ActiveRecord::Base
         filtered_audit_trail[:line_items] << deleted_li
       end
     end
-
     filtered_audit_trail[:sub_service_request_id] = self.id
     filtered_audit_trail
   end

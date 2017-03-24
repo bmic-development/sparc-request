@@ -176,7 +176,7 @@ class ServiceRequestsController < ApplicationController
     @protocol = @service_request.protocol
     @service_request.previous_submitted_at = @service_request.submitted_at
 
-    NotifierLogic.new(@service_request, @sub_service_request, current_user).send_confirmation_notifications_get_a_cost_estimate
+    NotifierLogic.new(@service_request, @sub_service_request, current_user).update_status_and_send_get_a_cost_estimate_email
     render formats: [:html]
   end
 
@@ -279,18 +279,14 @@ class ServiceRequestsController < ApplicationController
     # Have the protocol clean up the arms
     @service_request.protocol.arm_cleanup if @service_request.protocol
 
-    # clean up sub_service_requests
     @service_request.reload
     @service_request.previous_submitted_at = @service_request.submitted_at
     @protocol = @service_request.protocol
+
+    # notify service providers and admin of a destroyed ssr upon deletion of ssr
     if ssr.line_items.empty?
-      destroyed_ssr_needing_notification = NotifierLogic.new(@service_request, nil, current_user).ssrs_that_have_been_updated_from_a_un_updatable_status
-      if destroyed_ssr_needing_notification.present?
-        # notify service providers and admin of a destroyed ssr upon deletion of ssr
-        notifier_logic = NotifierLogic.new(@service_request, nil, current_user)
-        notifier_logic.send_ssr_service_provider_notifications(ssr, ssr_destroyed: true, request_amendment: false)
-        notifier_logic.send_admin_notifications([ssr], request_amendment: false, ssr_destroyed: true)
-      end
+      notifier_logic = NotifierLogic.new(@service_request, nil, current_user)
+      notifier_logic.ssr_deletion_emails(ssr, ssr_destroyed: true, request_amendment: false)
       ssr.destroy
     end
 

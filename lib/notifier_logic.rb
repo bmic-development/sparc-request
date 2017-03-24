@@ -28,24 +28,11 @@ class NotifierLogic
     @ssrs_updated_from_un_updatable_status = ssrs_that_have_been_updated_from_a_un_updatable_status
   end
 
-    # Require Request Amendment Email
-  def ssrs_that_have_been_updated_from_a_un_updatable_status
-    draft_ssrs = find_draft_ssrs
-    # Filtering out the newly created draft ssrs
-    # newly_created_ssrs = draft_ssrs.map(&:id) & @created_ssrs_needing_notification.map(&:auditable_id)
-    # draft_ssr_ids = draft_ssrs.map(&:id) - newly_created_ssrs
-
-    ssrs_that_have_been_updated_from_a_un_updatable_status = []
-    draft_ssrs.each do |ssr|
-      past_status = PastStatus.where(sub_service_request_id: ssr.id).last
-      un_updatable_statuses = SubServiceRequest.all.map(&:status).uniq - UPDATABLE_STATUSES
-      if past_status.present?
-        if un_updatable_statuses.include?(past_status.status)
-          ssrs_that_have_been_updated_from_a_un_updatable_status << ssr
-        end
-      end
+  def ssr_deletion_emails(ssr, ssr_destroyed: true, request_amendment: false)
+    if @destroyed_ssrs_needing_notification.present?
+      send_ssr_service_provider_notifications(ssr, ssr_destroyed: true, request_amendment: false)
+      send_admin_notifications([ssr], request_amendment: false, ssr_destroyed: true)
     end
-    ssrs_that_have_been_updated_from_a_un_updatable_status
   end
 
   def update_ssrs_and_send_emails
@@ -62,38 +49,10 @@ class NotifierLogic
     end
 
     send_request_amendment_email_evaluation
-
-    send_confirmation_notifications_submitted
+    send_initial_submission_email
   end
 
-  def send_request_amendment_email_evaluation
-    # SCENARIO:  If an existing SSR has had services added/deleted:
-      # USERS: receive a request amendment
-      # 
-      # ADMIN/SP: receive a request amendment
-    # SCENARIO:  If an SSR has been deleted or created:
-      # USERS: receive a request amendment
-      # 
-      # ADMIN/SP:  receive an initial submission email
-    
-    if @ssrs_updated_from_un_updatable_status.present? || @destroyed_ssrs_needing_notification.present? || @created_ssrs_needing_notification.present?
-      send_user_notifications(request_amendment: true)
-    end
-
-    if @ssrs_updated_from_un_updatable_status.present?
-      send_service_provider_notifications(@ssrs_updated_from_un_updatable_status, request_amendment: true)
-      send_admin_notifications(@ssrs_updated_from_un_updatable_status, request_amendment: true)
-    end
-    
-    # if @ssrs_updated_from_un_updatable_status.present? || @destroyed_ssrs_needing_notification.present? || @created_ssrs_needing_notification.present?
-    #   send_user_notifications(request_amendment: true)
-    # elsif @ssrs_updated_from_un_updatable_status.present?
-    #   send_service_provider_notifications(@ssrs_updated_from_un_updatable_status, request_amendment: true)
-    #   send_admin_notifications(@ssrs_updated_from_un_updatable_status, request_amendment: true)
-    # end
-  end
-
-  def send_confirmation_notifications_get_a_cost_estimate
+  def update_status_and_send_get_a_cost_estimate_email
     to_notify = []
     if @sub_service_request
       to_notify = @sub_service_request.update_status('get_a_cost_estimate')
@@ -110,15 +69,6 @@ class NotifierLogic
         send_admin_notifications(sub_service_requests, request_amendment: false)
         send_service_provider_notifications(sub_service_requests, request_amendment: false)
       end
-    end
-  end
-
-  def send_confirmation_notifications_submitted
-    if @sub_service_request && @to_notify.include?(@sub_service_request.id)
-      send_notifications([@sub_service_request])
-    elsif !@to_notify.empty?
-      sub_service_requests = @service_request.sub_service_requests.where(id: @to_notify)
-      send_notifications(sub_service_requests) unless sub_service_requests.empty? # if nothing is set to notify then we shouldn't send out e-mails
     end
   end
 
@@ -148,6 +98,45 @@ class NotifierLogic
   end
 
   private
+
+  def ssrs_that_have_been_updated_from_a_un_updatable_status
+    draft_ssrs = find_draft_ssrs
+    # Filtering out the newly created draft ssrs
+    ssrs_that_have_been_updated_from_a_un_updatable_status = []
+    draft_ssrs.each do |ssr|
+      past_status = PastStatus.where(sub_service_request_id: ssr.id).last
+      un_updatable_statuses = SubServiceRequest.all.map(&:status).uniq - UPDATABLE_STATUSES
+      if past_status.present?
+        if un_updatable_statuses.include?(past_status.status)
+          ssrs_that_have_been_updated_from_a_un_updatable_status << ssr
+        end
+      end
+    end
+    ssrs_that_have_been_updated_from_a_un_updatable_status
+  end
+
+
+  def send_initial_submission_email
+    
+    if @sub_service_request && @to_notify.include?(@sub_service_request.id)
+      send_notifications([@sub_service_request])
+    elsif !@to_notify.empty?
+      sub_service_requests = @service_request.sub_service_requests.where(id: @to_notify)
+      send_notifications(sub_service_requests) unless sub_service_requests.empty? # if nothing is set to notify then we shouldn't send out e-mails
+    end
+  end
+
+  def send_request_amendment_email_evaluation
+    if @ssrs_updated_from_un_updatable_status.present? || @destroyed_ssrs_needing_notification.present? || @created_ssrs_needing_notification.present?
+      send_user_notifications(request_amendment: true)
+    end
+    
+    if @ssrs_updated_from_un_updatable_status.present?
+      send_service_provider_notifications(@ssrs_updated_from_un_updatable_status, request_amendment: true)
+      send_admin_notifications(@ssrs_updated_from_un_updatable_status, request_amendment: true)
+    end
+  end
+
   def send_notifications(sub_service_requests)
     # If user has added a new service related to a new ssr and edited an existing ssr, 
     # we only want to send a request amendment email and not an initial submit email
@@ -185,7 +174,7 @@ class NotifierLogic
     else
       approval = false
     end
-
+  
     # send e-mail to all folks with view and above
     @service_request.protocol.project_roles.each do |project_role|
       next if project_role.project_rights == 'none' || project_role.identity.email.blank?
@@ -231,15 +220,7 @@ class NotifierLogic
     end
 
     individual_ssr = @sub_service_request.present? ? true : false
-
     Notifier.notify_service_provider(service_provider, @service_request, attachments, @current_user, sub_service_request, audit_report, ssr_destroyed, request_amendment, individual_ssr).deliver_now
-  end
-
-   def send_request_amendment(sub_service_requests)
-    sub_service_requests = [sub_service_requests].flatten
-    send_user_notifications(request_amendment: true)
-    send_service_provider_notifications(sub_service_requests, request_amendment: true)
-    send_admin_notifications(sub_service_requests, request_amendment: true)
   end
 
   def filter_audit_trail(identity, ssr_ids_that_need_auditing)
@@ -264,18 +245,16 @@ class NotifierLogic
     destroyed_ssrs_ids = destroyed_ssrs_ids - created_and_destroyed_ssrs
     ssr_ids_that_need_auditing = [@ssrs_updated_from_un_updatable_status.map(&:id), added_ssrs_ids].flatten
     ssr_ids_that_need_auditing = ssr_ids_that_need_auditing - created_and_destroyed_ssrs
-    
+ 
     destroyed_lis = []
     destroyed_ssrs_ids.each do |id|
       destroyed_lis << AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{id}%' AND auditable_type = 'LineItem' AND user_id = #{@current_user.id} AND action IN ('destroy') AND created_at BETWEEN '#{@service_request.previous_submitted_at.utc}' AND '#{Time.now.utc}'")
     end
 
     audit_report = filter_audit_trail(@current_user, ssr_ids_that_need_auditing)
-    
-    # audit_report = @service_request.audit_all_line_items(@current_user)
     audit_report = [audit_report, destroyed_lis].flatten
-
     filtered_audit_report = { :line_items => [] }
+    
     audit_report.group_by{ |audit| audit[:audited_changes]['service_id'] }.each do |service_id, audits|
       service_actions_since_previous_submission = audits.sort_by(&:created_at).map(&:action)
       if service_actions_since_previous_submission.size >= 2 && service_actions_since_previous_submission.first == 'create' && service_actions_since_previous_submission.last == 'create'

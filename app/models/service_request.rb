@@ -446,15 +446,14 @@ class ServiceRequest < ActiveRecord::Base
       available = AVAILABLE_STATUSES.keys
       editable = EDITABLE_STATUSES[ssr.organization_id] || available
       changeable = available & editable
-
       if changeable.include?(new_status)
         if (ssr.status != new_status) && UPDATABLE_STATUSES.include?(ssr.status)
-          # If the new status is 'submitted' and the old status is 'draft', we need to figure out if this SSR is coming from an updatable_status or not.
-
-          # Scenario for status change to 'submitted':  A user goes through to modify a SR and actually adds/removes services, the status of that SSR is changed to 'draft' from whatever status it was previously.  In this case, we would want to send a request amendment email NOT an initial submission email.  However, if we are creating a new request, all of those SSRs will have a status of 'draft' that have never been submitted before (past_status == nil), we would want that initial submission email and not the request amendment email.  Also if we are coming from an updatable_status such as 'get_a_cost_estimate', we want an initial submission email EVEN IF this SSR has been submitted before.
+          # Since adding/removing services changes a SSR status to 'draft', we have to look at the past status to see if we should notify users
+          # We do NOT notify if coming from an un-updatable status, only notify when past status is updatable
           past_status = PastStatus.where(sub_service_request_id: ssr.id).last
+          past_status_status = !past_status.nil? ? past_status.status : ''
           if new_status == 'submitted'
-            if ssr.status == 'draft' && (UPDATABLE_STATUSES.include?(past_status) || past_status == nil) # past_status == nil indicates a newly created SSR
+            if ssr.status == 'draft' && (UPDATABLE_STATUSES.include?(past_status_status) || past_status == nil) # past_status == nil indicates a newly created SSR
               to_notify << ssr.id
             elsif ssr.status != 'draft'
               to_notify << ssr.id 
@@ -467,9 +466,7 @@ class ServiceRequest < ActiveRecord::Base
         end
       end
     end
-
     self.save(validate: use_validation)
-
     to_notify
   end
 
