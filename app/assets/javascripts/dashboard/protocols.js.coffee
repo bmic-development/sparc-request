@@ -114,14 +114,6 @@ $(document).ready ->
       # Protocol Index End
 
       # Protocol Show Begin
-      $(document).on 'click', '.view-protocol-details-button', ->
-        protocol_id = $(this).data('protocol-id')
-        $.ajax
-          method: 'get'
-          url: "/dashboard/protocols/#{protocol_id}/view_details"
-          data:
-            service_request_id: $("input[name='service_request_id']").val()
-
       $(document).on 'click', '.edit-protocol-information-button', ->
         if $(this).data('permission')
           protocol_id = $(this).data('protocol-id')

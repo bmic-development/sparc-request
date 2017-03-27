@@ -85,7 +85,7 @@ RSpec.describe 'User should see RM ID displayed', js: true do
 
     visit protocol_service_request_path(sr)
 
-    click_button 'View Study Details'
+    click_link 'View Study Details'
 
     expect(page).to have_content 'Research Master ID: 1'
   end
@@ -163,7 +163,7 @@ RSpec.describe 'User should see RM ID displayed', js: true do
 
     visit protocol_service_request_path(sr)
 
-    click_button 'View Study Details'
+    click_link 'View Study Details'
 
     expect(page).to have_content 'Research Master ID: Not Available'
   end

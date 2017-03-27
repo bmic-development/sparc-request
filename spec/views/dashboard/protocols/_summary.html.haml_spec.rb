@@ -32,7 +32,7 @@ RSpec.describe 'dashboard/protocols/summary', type: :view do
 
   context 'Protocol is a Study' do
     it 'should be titled "Study Summary"' do
-      protocol = build(:protocol_federally_funded,
+      protocol = create(:protocol_federally_funded,
         :without_validations,
         primary_pi: jug2,
         type: 'Study',
@@ -45,7 +45,7 @@ RSpec.describe 'dashboard/protocols/summary', type: :view do
     end
 
     it 'should display a "Study Notes" button' do
-      protocol = build(:protocol_federally_funded,
+      protocol = create(:protocol_federally_funded,
         :without_validations,
         primary_pi: jug2,
         type: 'Study',
@@ -112,7 +112,7 @@ RSpec.describe 'dashboard/protocols/summary', type: :view do
 
   context 'Protocol is a Project' do
     it 'should display a "Project Notes" button' do
-      protocol = build(:protocol_federally_funded,
+      protocol = create(:protocol_federally_funded,
         :without_validations,
         primary_pi: jug2,
         type: 'Project',
@@ -126,7 +126,7 @@ RSpec.describe 'dashboard/protocols/summary', type: :view do
     end
 
     it 'should be titled "Project Summary"' do
-      protocol = build(:protocol_federally_funded,
+      protocol = create(:protocol_federally_funded,
         :without_validations,
         primary_pi: jug2,
         type: 'Project',

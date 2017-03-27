@@ -32,12 +32,3 @@ $(document).ready ->
       description.addClass('hidden')
 
   $('.protocol-select-help a').tooltip()
-
-  $(document).on 'click', '.view-protocol-details-button', ->
-    protocol_id = $(this).data('protocol-id')
-    $.ajax
-      type: 'get'
-      url: "/protocols/#{protocol_id}/view_details"
-      data:
-        service_request_id: $("input[name='service_request_id']").val()
-    return false

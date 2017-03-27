@@ -1,4 +1,4 @@
-# Copyright © 2011 MUSC Foundation for Research Development
+# Copyright © 2011-2016 MUSC Foundation for Research Development
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,31 +18,25 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'rails_helper'
+FactoryGirl.define do
+  factory :study_type_question_group do
 
-RSpec.describe 'User views protocol details', js: true do
-  let_there_be_lane
-  fake_login_for_each_test
+    version 1
 
-  before :each do
-    institution = create(:institution, name: "Institution")
-    provider    = create(:provider, name: "Provider", parent: institution)
-    program     = create(:program, name: "Program", parent: provider, process_ssrs: true)
-    service     = create(:service, name: "Service", abbreviation: "Service", organization: program)
-    @protocol   = create(:protocol_federally_funded, type: 'Study', primary_pi: jug2)
-    @sr         = create(:service_request_without_validations, status: 'first_draft', protocol: @protocol)
-    ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: program, status: 'first_draft')
-                  create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
-  end
-
-  context 'and clicks View Details' do
-    scenario 'and sees the details modal' do
-      visit protocol_service_request_path(@sr)
-      wait_for_javascript_to_finish
-      click_button 'View Study Details'
-      wait_for_javascript_to_finish
-
-      expect(page).to have_selector('#modal-title', text: "Study Details: ##{@protocol.id}", visible: true)
+    transient do
+      protocol_id nil
     end
+
+    trait :active do
+      active true
+    end
+
+    trait :with_questions do
+      after(:create) do |stqg, evaluator|
+        create_list(:study_type_question_with_answer, 3, study_type_question_group: stqg, protocol_id: evaluator.protocol_id)
+      end
+    end
+
+    factory :active_study_group_with_questions, traits: [:active, :with_questions]
   end
 end

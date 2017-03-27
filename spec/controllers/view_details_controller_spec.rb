@@ -1,4 +1,4 @@
-# Copyright © 2011 MUSC Foundation for Research Development
+# Copyright © 2011-2016 MUSC Foundation for Research Development
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -20,32 +20,13 @@
 
 require 'rails_helper'
 
-RSpec.describe 'User views a SSR', js: true do
-  let_there_be_lane
+RSpec.describe ViewDetailsController, type: :controller do
 
-  fake_login_for_each_test
-
-  before :each do
-    institution = create(:institution, name: "Institution")
-    provider    = create(:provider, name: "Provider", parent: institution)
-    program     = create(:program, name: "Program", parent: provider, process_ssrs: true)
-    service     = create(:service, name: "Service", abbreviation: "Service", organization: program)
-    @protocol   = create(:protocol_federally_funded, type: 'Study', primary_pi: jug2)
-    @sr         = create(:service_request_without_validations, status: 'first_draft', protocol: @protocol)
-    ssr         = create(:sub_service_request_without_validations, service_request: @sr, organization: program, status: 'first_draft')
-                  create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
-                  create(:arm, protocol: @protocol, visit_count: 1)
-  end
-
-  context 'and clicks the row' do
-    scenario 'and sees the view SSR modal' do
-      visit review_service_request_path(@sr)
-      wait_for_javascript_to_finish
-
-      click_link 'View Study Details'
-      wait_for_javascript_to_finish
-
-      expect(page).to have_selector('.modal-dialog', text: "Study Details: ##{@protocol.id}", visible: true)
+  describe "GET #view_details" do
+    it "returns http success" do
+      protocol = create(:protocol_without_validations)
+      get :show, protocol_id: protocol, format: :js
+      expect(response).to have_http_status(:success)
     end
   end
 end

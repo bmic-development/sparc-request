@@ -18,5 +18,13 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-$("#modal_place").html("<%= escape_javascript(render( 'protocols/view_details', protocol: @protocol )) %>")
-$("#modal_place").modal 'show'
+class ViewDetailsController < ApplicationController
+  protect_from_forgery except: :show
+
+  def show
+    @protocol = Protocol.find(params[:protocol_id])
+    respond_to do |format|
+      format.js
+    end
+  end
+end
