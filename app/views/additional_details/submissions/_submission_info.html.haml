@@ -7,6 +7,13 @@
             %h4.list-group-item-heading
               = item.content
             %p.list-group-item-text
-              = qr.content.delete('[]').delete('\"')
+              - if item.item_type == 'multiple_dropdown'
+                = qr.content.delete('[]').delete('\"')
+              - elsif item.item_type == 'time'
+                = convert_time(qr.content)
+              - elsif item.item_type == 'checkbox'
+                = qr.content.gsub(/["\[\]]/, '')
+              - else
+                = qr.content
       - unless item == @items.last
         %hr

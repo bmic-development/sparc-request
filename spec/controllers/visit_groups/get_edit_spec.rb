@@ -1,4 +1,4 @@
-# Copyright © 2011-2016 MUSC Foundation for Research Development
+# Copyright © 2011 MUSC Foundation for Research Development
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -18,10 +18,36 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class NavigationsController < ApplicationController
-  before_filter :initialize_service_request
-  before_filter :authorize_identity
-  def index
-    @institutions = Institution.all
+require 'rails_helper'
+
+RSpec.describe VisitGroupsController, type: :controller do
+  stub_controller
+  let!(:before_filters) { find_before_filters }
+  let!(:logged_in_user) { create(:identity) }
+
+  describe '#edit' do
+
+    it 'should call before_filter #initialize_service_request' do
+      expect(before_filters.include?(:initialize_service_request)).to eq(true)
+    end
+
+    it 'should call before_filter #authorize_identity' do
+      expect(before_filters.include?(:authorize_identity)).to eq(true)
+    end
+
+    it 'should have success status' do
+      protocol  = create(:protocol_without_validations, primary_pi: logged_in_user)
+      sr        = create(:service_request_without_validations, protocol: protocol)
+      arm       = create(:arm, protocol: protocol, name: "Armada")
+      vg        = create(:visit_group, arm: arm, day: 1, name: "Visit Me Baby One More Time")
+
+      xhr :get, :edit, {
+        id: vg.id,
+        service_request_id: sr.id
+      }
+
+      expect(response).to have_http_status(200)
+    end
   end
 end
+

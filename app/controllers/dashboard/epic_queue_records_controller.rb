@@ -17,7 +17,27 @@
 # DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+class Dashboard::EpicQueueRecordsController < Dashboard::BaseController
+  before_action :authorize_overlord
 
-class StudyTracker::PaymentsController < StudyTracker::BaseController
-  
+  def index
+    @epic_queue_records = EpicQueueRecord.with_valid_protocols
+    respond_to do |format|
+      format.json
+    end
+  end
+
+  private
+  # Check to see if user has rights to view epic queues
+  def authorize_overlord
+    unless QUEUE_EPIC_EDIT_LDAP_UIDS.include?(@user.ldap_uid)
+      @epic_queues = nil
+      @epic_queue = nil
+      render partial: 'service_requests/authorization_error',
+        locals: { error: 'You do not have access to view the Epic Queues',
+                  in_dashboard: false 
+      }
+    end
+  end
 end
+

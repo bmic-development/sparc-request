@@ -22,10 +22,10 @@
 require 'csv'
 module SurveyorControllerCustomMethods
   def self.included(base)
-    base.send :before_filter, :set_current_user
-    # base.send :before_filter, :authenticate_identity! # SPARC Request Authentication
-    # base.send :before_filter, :require_user   # AuthLogic
-    # base.send :before_filter, :login_required  # Restful Authentication
+    base.send :before_action, :set_current_user
+    # base.send :before_action, :authenticate_identity! # SPARC Request Authentication
+    # base.send :before_action, :require_user   # AuthLogic
+    # base.send :before_action, :login_required  # Restful Authentication
     base.send :layout, :resolve_layout
   end
 
@@ -74,7 +74,7 @@ module SurveyorControllerCustomMethods
   def update
     question_ids_for_dependencies = (r_params || []).map{|k,v| v["question_id"] }.compact.uniq
     saved = load_and_update_response_set_with_retries
-    return redirect_with_message(surveyor_finish, :notice, t('surveyor.completed_survey')) if saved && finish_params
+    return redirect_with_message(surveyor_finish, :notice, t('surveyor.completed_survey.message')) if saved && finish_params
 
     respond_to do |format|
       format.html do

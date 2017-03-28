@@ -27,6 +27,12 @@ $(document).ready ->
   getSSRId = ->
     $("input[name='sub_service_request_id']").val()
 
+  $(document).on 'click', '.custom-tab a', ->
+    if $(this).is('#billing-strategy-tab')
+      $('.billing-info ul').removeClass('hidden')
+    else
+      $('.billing-info ul').addClass('hidden')
+
   $(document).on 'click', '.page-change-arrow', ->
     unless $(this).attr('disabled')
       $.ajax
@@ -116,8 +122,8 @@ calculate_max_rates = (arm_id) ->
     direct_total_display = '$' + (direct_total).toFixed(2)
     max_total_display = '$' + (Math.floor(max_total * 100) / 100).toFixed(2)
 
-    $(".arm-calendar-container-#{arm_id}:visible #{column}.max-direct-per-patient").html(direct_total_display)
-    $(".arm-calendar-container-#{arm_id}:visible #{column}.max-total-per-patient").html(max_total_display)
+    $(".arm-calendar-container-#{arm_id}:visible #{column}.max-direct-per-patient strong").html(direct_total_display)
+    $(".arm-calendar-container-#{arm_id}:visible #{column}.max-total-per-patient strong").html(max_total_display)
 
 getSRId = ->
   $("input[name='service_request_id']").val()
@@ -131,6 +137,8 @@ getSRId = ->
     data.tab = tab
     data.arm_id = arm_id
     data.service_request_id = getSRId()
+    data.sub_service_request_id = data.subServiceRequestId
+    data.protocol_id = data.protocolId
     # Reload calendar
     $.get '/service_calendars/table.js', data
 

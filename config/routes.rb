@@ -127,7 +127,7 @@ SparcRails::Application.routes.draw do
   end
 
   resources :line_items, only: [:update]
-  resources :visit_groups, only: [:update]
+  resources :visit_groups, only: [:edit, :update]
 
   resources :documents, only: [:index, :new, :create, :edit, :update, :destroy]
 
@@ -218,6 +218,7 @@ SparcRails::Application.routes.draw do
     resources :documents, except: [:show]
 
     resources :epic_queues, only: [:index, :destroy]
+    resources :epic_queue_records, only: [:index]
 
     resources :fulfillments
 

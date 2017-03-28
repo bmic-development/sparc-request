@@ -52,6 +52,17 @@ FactoryGirl.define do
       protocol_filter_count 0
     end
 
+    trait :without_validations do
+      after(:build) do |user|
+        begin
+          user.class.skip_callback(:create, :after, :send_admin_mail)
+        rescue ArgumentError
+          # Do nothing. Callback has already been skipped.
+        end
+      end
+      to_create { |instance| instance.save(validate: false) }
+    end
+
     after(:build) do |identity, evaluator|
       create_list(:catalog_manager,
        evaluator.catalog_manager_count, identity: identity)

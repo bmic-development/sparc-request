@@ -23,7 +23,7 @@ class ApplicationController < ActionController::Base
   helper :all
   helper_method :current_user
   helper_method :xeditable?
-  before_filter :set_highlighted_link  # default is to not highlight a link
+  before_action :set_highlighted_link  # default is to not highlight a link
   before_action :configure_permitted_parameters, if: :devise_controller?
 
   protected
@@ -159,7 +159,7 @@ class ApplicationController < ActionController::Base
 
   # Create a new service request and assign it to @service_request.
   def create_new_service_request(from_portal=false)
-    status = from_portal ? 'draft' : 'first_draft'
+    status = 'first_draft'
     @service_request = ServiceRequest.new(status: status)
 
     if params[:protocol_id] # we want to create a new service request that belongs to an existing protocol

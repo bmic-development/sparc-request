@@ -18,32 +18,4 @@
 # INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 # TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-class StudyTracker::BaseController < ActionController::Base
-  layout 'portal/application'
-  protect_from_forgery
-  helper_method :current_user
-
-  before_filter :authenticate_identity!
-  before_filter :set_user
-  before_filter :check_clinical_provider_rights
-
-  def current_user
-    current_identity
-  end
-  
-  def set_user
-    @user = current_identity
-    session['uid'] = @user.nil? ? nil : @user.id
-  end
-
-  def clean_errors errors
-    errors.to_a.map {|k,v| "#{k.humanize} #{v}".rstrip + '.'}
-  end
-
-  private
-  def check_clinical_provider_rights
-    unless @user.clinical_provider_rights?
-      redirect_to root_path
-    end
-  end
-end
+$('.epic-queue-table').bootstrapTable('refresh')

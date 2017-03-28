@@ -31,13 +31,9 @@ class LineItemsVisit < ActiveRecord::Base
   has_one :service, through: :line_item
   has_many :visits, -> { includes(:visit_group).order("visit_groups.position") }, :dependent => :destroy
 
-  attr_accessible :arm_id
-  attr_accessible :line_item_id
-  attr_accessible :subject_count  # number of subjects for this visit grouping
-  attr_accessible :hidden
-
-  validates_numericality_of :subject_count
   validate :subject_count_valid
+  validate :pppv_line_item
+  validates_numericality_of :subject_count
 
   after_save :set_arm_edited_flag_on_subjects
 
@@ -47,6 +43,12 @@ class LineItemsVisit < ActiveRecord::Base
   def subject_count_valid
     if subject_count && subject_count > arm.subject_count
       errors.add(:blank, I18n.t('errors.line_items_visits.subject_count_invalid', arm_subject_count: arm.subject_count))
+    end
+  end
+
+  def pppv_line_item
+    if self.line_item.one_time_fee
+      errors.add(:_, 'Line Items Visits should only belong to a PPPV LineItem')
     end
   end
 

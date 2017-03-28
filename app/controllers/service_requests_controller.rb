@@ -23,13 +23,13 @@ require 'generate_request_grant_billing_pdf'
 class ServiceRequestsController < ApplicationController
   respond_to :js, :json, :html
 
-  before_filter :initialize_service_request,      except: [:approve_changes, :get_help, :feedback]
-  before_filter :validate_step,                   only:   [:protocol, :service_details, :service_calendar, :service_subsidy, :document_management, :review, :obtain_research_pricing, :confirmation, :save_and_exit]
-  before_filter :setup_navigation,                only:   [:navigate, :protocol, :service_details, :service_calendar, :service_subsidy, :document_management, :review, :obtain_research_pricing, :confirmation]
-  before_filter :authorize_identity,              except: [:approve_changes, :get_help, :feedback, :show]
-  before_filter :authenticate_identity!,          except: [:catalog, :add_service, :remove_service, :get_help, :feedback]
-  before_filter :authorize_protocol_edit_request, only:   [:catalog]
-  before_filter :find_locked_org_ids,             only:   [:catalog]
+  before_action :initialize_service_request,      except: [:approve_changes, :get_help, :feedback]
+  before_action :validate_step,                   only:   [:protocol, :service_details, :service_calendar, :service_subsidy, :document_management, :review, :obtain_research_pricing, :confirmation, :save_and_exit]
+  before_action :setup_navigation,                only:   [:navigate, :protocol, :service_details, :service_calendar, :service_subsidy, :document_management, :review, :obtain_research_pricing, :confirmation]
+  before_action :authorize_identity,              except: [:approve_changes, :get_help, :feedback, :show]
+  before_action :authenticate_identity!,          except: [:catalog, :add_service, :remove_service, :get_help, :feedback]
+  before_action :authorize_protocol_edit_request, only:   [:catalog]
+  before_action :find_locked_org_ids,             only:   [:catalog]
 
   def show
     @protocol = @service_request.protocol
@@ -51,13 +51,7 @@ class ServiceRequestsController < ApplicationController
     when 'protocol'
       @service_request.group_valid?(:protocol)
     when 'service_details'
-      details_params = params[:study] ? params[:study] : params[:project]
-      details_params = convert_date_for_save(details_params, :start_date)
-      details_params = convert_date_for_save(details_params, :end_date)
-      details_params = convert_date_for_save(details_params, :recruitment_start_date)
-      details_params = convert_date_for_save(details_params, :recruitment_end_date)
-
-      @service_request.protocol.update_attributes( details_params ) if @service_request.protocol
+      @service_request.protocol.update_attributes(details_params) if @service_request.protocol
       @service_request.group_valid?(:service_details)
     when 'service_calendar'
       @service_request.group_valid?(:service_calendar)
@@ -128,13 +122,6 @@ class ServiceRequestsController < ApplicationController
     end
   end
 
-  # do not delete. Method will be needed if calendar totals page is used
-  # def calendar_totals
-  #   if @service_request.arms.blank?
-  #     @back = 'service_details'
-  #   end
-  # end
-
   def service_subsidy
     @has_subsidy          = @service_request.sub_service_requests.map(&:has_subsidy?).any?
     @eligible_for_subsidy = @service_request.sub_service_requests.map(&:eligible_for_subsidy?).any?
@@ -162,6 +149,8 @@ class ServiceRequestsController < ApplicationController
   end
 
   def review
+    @notable_type = 'Protocol'
+    @notable_id = @service_request.protocol_id
     @tab          = 'calendar'
     @review       = true
     @portal       = false
@@ -239,7 +228,7 @@ class ServiceRequestsController < ApplicationController
         li.update_attribute(:sub_service_request_id, ssr.id)
         if @service_request.status == 'first_draft'
           ssr.update_attribute(:status, 'first_draft')
-        elsif ssr.status.nil? || (ssr.can_be_edited? && ssr_has_changed?(@service_request, ssr) && (ssr.status != 'complete'))
+        elsif ssr.status.nil? || (ssr.can_be_edited? && ssr_has_changed?(@service_request, ssr))
           previous_status = ssr.status
           ssr.update_attribute(:status, 'draft')
         end
@@ -279,7 +268,7 @@ class ServiceRequestsController < ApplicationController
     line_items.reload
 
     @service_request.reload
-    @page = request.referrer.split('/').last # we need for pages other than the catalog
+    @page = previous_page
 
     # Have the protocol clean up the arms
     @service_request.protocol.arm_cleanup if @service_request.protocol
@@ -312,7 +301,7 @@ class ServiceRequestsController < ApplicationController
   end
 
   def feedback
-    feedback = Feedback.new(params[:feedback])
+    feedback = Feedback.new(feedback_params)
     if feedback.save
       Notifier.provide_feedback(feedback).deliver_now
       flash.now[:success] = t(:proper)[:right_navigation][:feedback][:submitted]
@@ -333,6 +322,33 @@ class ServiceRequestsController < ApplicationController
   end
 
   private
+
+  def previous_page
+    # we need for pages other than the catalog
+    request.referrer.split('/').last
+  end
+
+  def feedback_params
+    params.require(:feedback).permit(:email, :message)
+  end
+
+  def details_params
+    @details_params ||= begin
+      required_keys = params[:study] ? :study : :project
+      temp = params.require(required_keys).permit(:start_date, :end_date,
+        :recruitment_start_date, :recruitment_end_date)
+
+      # Finally, transform date attributes.
+      date_attrs = %w(start_date end_date recruitment_start_date recruitment_end_date)
+      temp.inject({}) do |h, (k, v)|
+        if date_attrs.include?(k) && v.present?
+          h.merge(k => Time.strptime(v, "%m/%d/%Y"))
+        else
+          h.merge(k => v)
+        end
+      end
+    end
+  end
 
   # Each of these helper methods assigns session[:errors] to persist the errors through the
   # redirect_to so that the user has an explanation
@@ -502,7 +518,7 @@ class ServiceRequestsController < ApplicationController
                       @service_request.status == 'first_draft' || current_user.can_edit_service_request?(@service_request)
                     end
 
-      protocol = @sub_service_request ? @sub_service_request.service_request.protocol : @service_request.protocol
+      protocol = @sub_service_request ? @sub_service_request.protocol : @service_request.protocol
 
       unless authorized || protocol.project_roles.find_by(identity: current_user).present?
         @service_request     = nil
@@ -517,7 +533,7 @@ class ServiceRequestsController < ApplicationController
   def find_or_create_sub_service_request(line_item, service_request)
     organization = line_item.service.process_ssrs_organization
     service_request.sub_service_requests.each do |ssr|
-      if (ssr.organization == organization) && (ssr.status != 'complete')
+      if (ssr.organization == organization) && !ssr.is_complete?
         return ssr
       end
     end
@@ -529,13 +545,5 @@ class ServiceRequestsController < ApplicationController
 
   def set_highlighted_link
     @highlighted_link ||= 'sparc_request'
-  end
-
-  def convert_date_for_save(attrs, date_field)
-    if attrs[date_field] && attrs[date_field].present?
-      attrs[date_field] = Time.strptime(attrs[date_field], "%m/%d/%Y")
-    end
-
-    attrs
   end
 end
