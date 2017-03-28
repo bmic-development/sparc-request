@@ -4,7 +4,7 @@ AUDIT_COMMENT = "merge_srs"
 
 task :merge_srs => :environment do
   ServiceRequest.skip_callback(:save, :after, :set_original_submitted_date)
-  nexus_org = [2, 11, 20, 36, 63, 180]
+  organizations = [64, 131]
   multiple_ssrs_fp = CSV.open("tmp/multiple_ssrs.csv", "w")
   # deleted_ssrs_fp = CSV.open("tmp/deleted_ssrs.csv", "w")
 
@@ -12,16 +12,16 @@ task :merge_srs => :environment do
   # deleted_ssrs_fp << ['Protocol ID', 'short title', 'ssr_id', 'Organization ID', 'Organization Name', 'SSR status', 'SSR pushed to Fulfillment?', 'SR ID', 'SR Submission date']
 
   # For each Protocol that has a Nexus SSR
-  protocols = Protocol.joins(:sub_service_requests).where(sub_service_requests: { organization_id: nexus_org }).distinct
+  protocols = Protocol.joins(:sub_service_requests).where(sub_service_requests: { organization_id: organizations }).distinct
   bar1 = ProgressBar.new(protocols.count)
   protocols.each do |protocol|
     # Grab all Nexus SSR's
-    # nexus_ssrs = protocol.sub_service_requests.where(organization_id: nexus_org)
+    # nexus_ssrs = protocol.sub_service_requests.where(organization_id: organizations)
 
     # If there are multiple Nexus SSR's
     # if nexus_ssrs.count > 1
     #   # Delete all (first_)draft Nexus SSR's in this Protocol after logging them
-    #   protocol.sub_service_requests.where(status: ['draft', 'first_draft'], organization_id: nexus_org).each do |ssr|
+    #   protocol.sub_service_requests.where(status: ['draft', 'first_draft'], organization_id: organizations).each do |ssr|
     #     begin
     #       ActiveRecord::Base.transaction do
     #         ssr.destroy
@@ -33,7 +33,7 @@ task :merge_srs => :environment do
     # end
 
     # Reload Nexus SSR's
-    nexus_ssrs = protocol.sub_service_requests.where(organization_id: nexus_org)
+    nexus_ssrs = protocol.sub_service_requests.where(organization_id: organizations)
 
     # If we _still_ have multiple Nexus SSR's
     if nexus_ssrs.count > 1
@@ -59,10 +59,10 @@ task :merge_srs => :environment do
   cant_delete_fp << ['Service Request ID']
 
   # For each Protocol that has a Nexus SSR
-  protocols = Protocol.joins(:sub_service_requests).where(sub_service_requests: { organization_id: nexus_org }).distinct
+  protocols = Protocol.joins(:sub_service_requests).where(sub_service_requests: { organization_id: organizations }).distinct
   bar2 = ProgressBar.new(protocols.count)
   protocols.each do |protocol|
-    nexus_org.each do |org_id|
+    organizations.each do |org_id|
       # Grab all Nexus SSR's
       nexus_ssrs = protocol.sub_service_requests.where(organization_id: org_id)
 
