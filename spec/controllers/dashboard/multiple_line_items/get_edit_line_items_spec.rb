@@ -35,7 +35,7 @@ RSpec.describe Dashboard::MultipleLineItemsController do
       allow(@sub_service_request).to receive(:candidate_services){@services}
       @arm = create(:arm_without_validations)
       @protocol = create(:protocol_without_validations, arms: [ @arm ])
-      @arm.update_attributes(line_item_visits: create_list(:line_item_visits_without_validations, 1, line_item: @line_items.first, subject_count: 1, arm: @arm), subject_count: 1, protocol: @protocol)
+      @arm.update_attributes(line_items_visits: create_list(:line_items_visits_without_validations, 1, line_item: @line_items.first, subject_count: 1, arm: @arm), subject_count: 1, protocol: @protocol)
       xhr :get, :edit_line_items, 
           service_request_id: @service_request.id,
           sub_service_request_id: @sub_service_request.id,
