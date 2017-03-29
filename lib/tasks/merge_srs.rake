@@ -100,7 +100,8 @@ task :merge_srs => :environment do
       last
 
     if latest_submitted_at
-      recent_service_request.assign_attributes({ submitted_at: latest_submitted_at, audit_comment: AUDIT_COMMENT }, without_protection: true)
+      recent_service_request.submitted_at = latest_submitted_at
+      recent_service_request.audit_comment = AUDIT_COMMENT
       recent_service_request.save(validate: false)
     end
 
@@ -112,24 +113,28 @@ task :merge_srs => :environment do
       first
 
     if earliest_original_submitted_date
-      recent_service_request.assign_attributes({ original_submitted_date: earliest_original_submitted_date, audit_comment: AUDIT_COMMENT }, without_protection: true)
+      recent_service_request.original_submitted_date = earliest_original_submitted_date
+      recent_service_request.audit_comment = AUDIT_COMMENT
       recent_service_request.save(validate: false)
     end
 
     # Move all SSR's, LineItems and ServiceRequest Notes under this recent_service_request
     protocol.sub_service_requests.where.not(service_request_id: recent_service_request.id).each do |ssr|
-      ssr.assign_attributes({ service_request_id: recent_service_request.id, audit_comment: AUDIT_COMMENT }, without_protection: true)
+      ssr.service_request_id = recent_service_request.id
+      ssr.audit_comment = AUDIT_COMMENT
       ssr.save
     end
     line_items = LineItem.joins(:service_request).where(service_requests: { protocol_id: protocol.id }).where.not(service_request_id: recent_service_request.id)
     line_items.each do |li|
-      li.assign_attributes({ service_request_id: recent_service_request.id, audit_comment: AUDIT_COMMENT }, without_protection: true)
+      li.service_request_id = recent_service_request.id
+      li.audit_comment = AUDIT_COMMENT
       li.save(validate: false)
     end
 
     protocol.service_requests.where.not(id: recent_service_request.id).each do |sr|
       sr.notes.each do |note|
-        note.assign_attributes({ notable_id: recent_service_request.id, audit_comment: AUDIT_COMMENT }, without_protection: true)
+        note.notable_id = recent_service_request.id
+        note.audit_comment = AUDIT_COMMENT
         note.save(validate: false)
       end
     end
@@ -150,7 +155,8 @@ def delete_empty_srs(protocol)
     rescue
       # Probably a funky Note body...
       sr.notes.each do |note|
-        note.assign_attributes({ notable_id: nil, audit_comment: AUDIT_COMMENT }, without_protection: true)
+        note.notable_id = nil
+        note.audit_comment = AUDIT_COMMENT
         note.save(validate: false)
       end
       sr.reload.destroy
