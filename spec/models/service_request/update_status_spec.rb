@@ -252,5 +252,26 @@ RSpec.describe ServiceRequest, type: :model do
         expect(@ssr_updatable_status.reload.status).to eq('get_a_cost_estimate')
       end
     end
+
+    context "past status same as status being updated to" do
+      before :each do
+        @org         = create(:organization_with_process_ssrs)
+        identity     = create(:identity)
+        service     = create(:service, organization: @org, one_time_fee: true)
+        protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
+        @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
+        @ssr_updatable_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: Time.now.yesterday.utc)
+        PastStatus.create(sub_service_request_id: @ssr_updatable_status.id, status: 'get_a_cost_estimate')
+      end
+
+      it "should return the id of the ssr that was not previously submitted" do
+        expect(@sr.update_status('get_a_cost_estimate')).to eq([])
+      end
+
+      it "should update the status of the SSR to submitted" do
+        @sr.update_status('get_a_cost_estimate')
+        expect(@ssr_updatable_status.reload.status).to eq('get_a_cost_estimate')
+      end
+    end
   end
 end

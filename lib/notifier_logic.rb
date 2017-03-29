@@ -40,7 +40,7 @@ class NotifierLogic
     @send_request_amendment_and_not_initial = @ssrs_updated_from_un_updatable_status.present? || @destroyed_ssrs_needing_notification.present? || @created_ssrs_needing_notification.present?
     @to_notify = []
     if @sub_service_request
-      @to_notify = @sub_service_request.update_status('submitted', true)
+      @to_notify = @sub_service_request.update_status_and_notify('submitted')
     else
       @to_notify = @service_request.update_status('submitted', true)
       @service_request.previous_submitted_at = @service_request.submitted_at
@@ -55,7 +55,7 @@ class NotifierLogic
   def update_status_and_send_get_a_cost_estimate_email
     to_notify = []
     if @sub_service_request
-      to_notify = @sub_service_request.update_status('get_a_cost_estimate')
+      to_notify = @sub_service_request.update_status_and_notify('get_a_cost_estimate')
       if to_notify.include?(@sub_service_request.id)
         send_user_notifications(request_amendment: false)
         send_admin_notifications([@sub_service_request], request_amendment: false)

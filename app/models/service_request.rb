@@ -316,6 +316,7 @@ class ServiceRequest < ActiveRecord::Base
   end
 
   def deleted_ssrs_since_previous_submission(start_time_at_previous_sub_time=false)
+    ### start_time varies depending on if the submitted_at has been updated or not
     if start_time_at_previous_sub_time
       start_time = previous_submitted_at.nil? ? Time.now.utc : previous_submitted_at.utc
     else
@@ -440,34 +441,11 @@ class ServiceRequest < ActiveRecord::Base
   def update_status(new_status, use_validation=true)
     to_notify = []
     self.assign_attributes(status: new_status)
-
     sub_service_requests.each do |ssr|
-      next unless ssr.can_be_edited?
-      available = AVAILABLE_STATUSES.keys
-      editable = EDITABLE_STATUSES[ssr.organization_id] || available
-      changeable = available & editable
-      if changeable.include?(new_status)
-        if (ssr.status != new_status) && UPDATABLE_STATUSES.include?(ssr.status)
-          # Since adding/removing services changes a SSR status to 'draft', we have to look at the past status to see if we should notify users
-          # We do NOT notify if coming from an un-updatable status, only notify when past status is updatable
-          past_status = PastStatus.where(sub_service_request_id: ssr.id).last
-          past_status_status = !past_status.nil? ? past_status.status : ''
-          if new_status == 'submitted'
-            if ssr.status == 'draft' && (UPDATABLE_STATUSES.include?(past_status_status) || past_status == nil) # past_status == nil indicates a newly created SSR
-              to_notify << ssr.id
-            elsif ssr.status != 'draft'
-              to_notify << ssr.id 
-            end
-            ssr.update_attributes(submitted_at: Time.now, nursing_nutrition_approved: false, lab_approved: false, imaging_approved: false, committee_approved: false)
-          else
-            to_notify << ssr.id
-          end
-          ssr.update_attribute(:status, new_status)
-        end
-      end
+      to_notify << ssr.update_status_and_notify(new_status)
     end
     self.save(validate: use_validation)
-    to_notify
+    to_notify.flatten
   end
 
   # Make sure that all the sub service requests have an ssr id
@@ -527,18 +505,6 @@ class ServiceRequest < ActiveRecord::Base
 
   def arms_editable?
     true #self.sub_service_requests.all?{|ssr| ssr.arms_editable?}
-  end
-
-  def audit_all_line_items(identity)
-    filtered_audit_trail = {:line_items => []}
-    sub_service_requests.each do |ssr|
-      ssr_line_item_audit = ssr.audit_line_items(identity)
-      if !ssr_line_item_audit.nil?
-        filtered_audit_trail[:line_items] << ssr_line_item_audit[:line_items]
-      end
-    end
-
-    filtered_audit_trail[:line_items].flatten
   end
 
   def audit_report( identity, start_date=self.previous_submitted_at.utc, end_date=Time.now.utc )
