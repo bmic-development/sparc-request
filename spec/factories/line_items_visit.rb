@@ -27,6 +27,6 @@ FactoryGirl.define do
       to_create { |instance| instance.save(validate: false) }
     end
 
-    factory :line_item_visits_without_validations, traits: [:without_validations]
+    factory :line_items_visits_without_validations, traits: [:without_validations]
   end
 end
