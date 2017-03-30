@@ -39,6 +39,7 @@ RSpec.describe NotifierLogic do
         @org2         = create(:organization_with_process_ssrs)
         ### ADMIN EMAIL ###
         @org.submission_emails.create(email: 'hedwig@owlpost.com')
+        @admin_email = 'hedwig@owlpost.com'
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: nil)
@@ -48,7 +49,7 @@ RSpec.describe NotifierLogic do
         ### LINE ITEM SETUP ###
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
-                      create(:service_provider, identity: logged_in_user, organization: @org)
+        @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
       end
 
@@ -58,9 +59,9 @@ RSpec.describe NotifierLogic do
           expect(mailer).to receive(:deliver_now)
           mailer
         end
-
+        project_role = @sr.protocol.project_roles.first
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email
-        expect(Notifier).to have_received(:notify_user) 
+        expect(Notifier).to have_received(:notify_user).with(project_role, @sr, nil, anything, false, logged_in_user, nil, false)
       end
 
       it 'should notify service providers (initial submission email)' do
@@ -71,7 +72,7 @@ RSpec.describe NotifierLogic do
         end
 
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email
-        expect(Notifier).to have_received(:notify_service_provider)
+        expect(Notifier).to have_received(:notify_service_provider).with(@service_provider, @sr, anything, logged_in_user, @ssr2, nil, false, false, false)
       end
 
       it 'should notify admin (initial submission email)' do
@@ -82,7 +83,7 @@ RSpec.describe NotifierLogic do
         end 
         
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email 
-        expect(Notifier).to have_received(:notify_admin)
+        expect(Notifier).to have_received(:notify_admin).with(@admin_email, anything, logged_in_user, @ssr2, nil, false, false)
       end
 
       it 'should send_user_notifications request_amendment=>false' do
@@ -115,6 +116,7 @@ RSpec.describe NotifierLogic do
         @org2         = create(:organization_with_process_ssrs)
         ### ADMIN EMAIL ###
         @org.submission_emails.create(email: 'hedwig@owlpost.com')
+        @admin_email = 'hedwig@owlpost.com'
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: nil)
@@ -191,6 +193,7 @@ RSpec.describe NotifierLogic do
         @org2         = create(:organization_with_process_ssrs)
         ### ADMIN EMAIL ###
         @org.submission_emails.create(email: 'hedwig@owlpost.com')
+        @admin_email = 'hedwig@owlpost.com'
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: nil)
@@ -200,7 +203,7 @@ RSpec.describe NotifierLogic do
         ### LINE ITEM SETUP ###
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
-                      create(:service_provider, identity: logged_in_user, organization: @org)
+        @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
       end
 
@@ -210,9 +213,9 @@ RSpec.describe NotifierLogic do
           expect(mailer).to receive(:deliver_now)
           mailer
         end
-
+        project_role = @sr.protocol.project_roles.first
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email
-        expect(Notifier).to have_received(:notify_user) 
+        expect(Notifier).to have_received(:notify_user).with(project_role, @sr, nil, anything, false, logged_in_user, nil, false)
       end
 
       it 'should notify service providers (initial submission email)' do
@@ -223,7 +226,7 @@ RSpec.describe NotifierLogic do
         end
 
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email
-        expect(Notifier).to have_received(:notify_service_provider)
+        expect(Notifier).to have_received(:notify_service_provider).with(@service_provider, @sr, anything, logged_in_user, @ssr2, nil, false, false, false)
       end
 
       it 'should notify admin (initial submission email)' do
@@ -234,7 +237,7 @@ RSpec.describe NotifierLogic do
         end 
         
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email 
-        expect(Notifier).to have_received(:notify_admin)
+        expect(Notifier).to have_received(:notify_admin).with(@admin_email, anything, logged_in_user, @ssr2, nil, false, false)
       end
 
       it 'should send_user_notifications request_amendment=>false' do
@@ -267,6 +270,7 @@ RSpec.describe NotifierLogic do
         @org2         = create(:organization_with_process_ssrs)
         ### ADMIN EMAIL ###
         @org.submission_emails.create(email: 'hedwig@owlpost.com')
+        @admin_email = 'hedwig@owlpost.com'
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: nil)
@@ -276,7 +280,7 @@ RSpec.describe NotifierLogic do
         ### LINE ITEM SETUP ###
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
-                      create(:service_provider, identity: logged_in_user, organization: @org)
+        @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
       end
 
@@ -286,9 +290,9 @@ RSpec.describe NotifierLogic do
           expect(mailer).to receive(:deliver_now)
           mailer
         end
-
+        project_role = @sr.protocol.project_roles.first
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email
-        expect(Notifier).to have_received(:notify_user) 
+        expect(Notifier).to have_received(:notify_user).with(project_role, @sr, nil, anything, false, logged_in_user, nil, false)
       end
 
       it 'should notify service providers (initial submission email)' do
@@ -299,7 +303,7 @@ RSpec.describe NotifierLogic do
         end
 
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email
-        expect(Notifier).to have_received(:notify_service_provider)
+        expect(Notifier).to have_received(:notify_service_provider).with(@service_provider, @sr, anything, logged_in_user, @ssr2, nil, false, false, false)
       end
 
       it 'should notify admin (initial submission email)' do
@@ -310,7 +314,7 @@ RSpec.describe NotifierLogic do
         end 
         
         NotifierLogic.new(@sr, nil, logged_in_user).update_status_and_send_get_a_cost_estimate_email 
-        expect(Notifier).to have_received(:notify_admin)
+        expect(Notifier).to have_received(:notify_admin).with(@admin_email, anything, logged_in_user, @ssr2, nil, false, false)
       end
 
       it 'should send_user_notifications request_amendment=>false' do

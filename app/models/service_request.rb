@@ -440,11 +440,10 @@ class ServiceRequest < ActiveRecord::Base
   # requests to the given status.
   def update_status(new_status, use_validation=true)
     to_notify = []
-    self.assign_attributes(status: new_status)
+    update_attribute(:status, new_status)
     sub_service_requests.each do |ssr|
       to_notify << ssr.update_status_and_notify(new_status)
     end
-    self.save(validate: use_validation)
     to_notify.flatten
   end
 

@@ -179,6 +179,7 @@ class NotifierLogic
     @service_request.protocol.project_roles.each do |project_role|
       next if project_role.project_rights == 'none' || project_role.identity.email.blank?
       # Do not want to send authorized user request amendment emails when audit_report is not present
+      
       if request_amendment && audit_report.present?
         Notifier.notify_user(project_role, @service_request, @sub_service_request, xls, approval, @current_user, audit_report, individual_ssr).deliver_now
       elsif !request_amendment

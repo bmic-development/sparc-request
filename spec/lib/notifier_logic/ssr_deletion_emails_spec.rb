@@ -38,6 +38,7 @@ RSpec.describe NotifierLogic do
         @org2         = create(:organization_with_process_ssrs)
         ### ADMIN EMAIL ###
         @org2.submission_emails.create(email: 'hedwig@owlpost.com')
+        @admin_email = 'hedwig@owlpost.com'
         service     = create(:service, organization: @org, one_time_fee: true)
         protocol    = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
@@ -47,7 +48,7 @@ RSpec.describe NotifierLogic do
         ### LINE ITEM SETUP ###
         li          = create(:line_item, service_request: @sr, sub_service_request: @ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: ssr2, service: service)
-                      create(:service_provider, identity: logged_in_user, organization: @org2)
+        @service_provider = create(:service_provider, identity: logged_in_user, organization: @org2)
         ### DELETE LINE ITEM WHICH IN TURNS DELETES SSR ###
         # mimics the service_requests_controller remove_service method
         @destroyed_li_id = li.id
@@ -78,7 +79,7 @@ RSpec.describe NotifierLogic do
         end
 
         NotifierLogic.new(@sr, nil, logged_in_user).ssr_deletion_emails(@ssr, ssr_destroyed: true, request_amendment: false)
-        expect(Notifier).to have_received(:notify_service_provider)
+        expect(Notifier).to have_received(:notify_service_provider).with(@service_provider, @sr, anything, logged_in_user, @ssr, nil, true, false, false)
       end
 
       it 'should notify admin (initial submission email)' do
@@ -89,7 +90,7 @@ RSpec.describe NotifierLogic do
         end 
         
         NotifierLogic.new(@sr, nil, logged_in_user).ssr_deletion_emails(@ssr, ssr_destroyed: true, request_amendment: false) 
-        expect(Notifier).to have_received(:notify_admin)
+        expect(Notifier).to have_received(:notify_admin).with(@admin_email, anything, logged_in_user, @ssr, nil, true, false)
       end
     end
   end
