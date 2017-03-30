@@ -66,5 +66,13 @@ RSpec.describe Dashboard::MultipleLineItemsController do
     it 'assigns arms' do
       expect(assigns(:arms)).to eq([@arm])
     end
+
+    it 'responds with 200 OK' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'renders the correct template' do
+      expect(controller).to render_template(:edit_line_items)
+    end
   end
 end

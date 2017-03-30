@@ -70,5 +70,9 @@ RSpec.describe Dashboard::MultipleLineItemsController do
     it 'assigns schedule tab' do
       expect(assigns(:study_tab)).to eq(@study_tab)
     end
+
+    it 'renders the correct template' do
+      expect(controller).to render_template(:new_line_items)
+    end
   end
 end

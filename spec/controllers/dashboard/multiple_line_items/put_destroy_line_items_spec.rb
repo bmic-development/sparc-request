@@ -52,14 +52,5 @@ RSpec.describe Dashboard::MultipleLineItemsController do
                         remove_service_id: @service.id
                         }.to change{ @sub_service_request.line_items.count }.from(3).to(0)
     end
-
-    it 'shows the correct flash message' do
-      xhr :put, :destroy_line_items, 
-                service_request_id: @service_request.id,
-                sub_service_request_id: @sub_service_request.id,
-                remove_service_id: @service.id
-
-      expect(flash.now[:alert]).to eq("Services Removed!")
-    end
   end
 end

@@ -40,27 +40,43 @@ RSpec.describe Dashboard::MultipleLineItemsController do
             add_service_id: @service.id
       end
 
-      it 'assigns the correct instance variables' do
+      it 'assigns the correct service request' do
         expect(assigns(:service_request)).to eq(@service_request)
-        expect(assigns(:sub_service_request)).to eq(@sub_service_request)
-        expect(assigns(:service)).to eq(@service)
       end
 
+      it 'assigns the correct ssr' do
+        expect(assigns(:sub_service_request)).to eq(@sub_service_request)
+      end
+
+      it 'assigns the correct service' do
+        expect(assigns(:service)).to eq(@service)
+      end
       it 'creates a default arm when the service request does not have one' do
         expect(assigns(:service_request).arms.length).to eq(1)
       end
 
-      it 'calls the correct object methods' do
+      it 'calls the correct service request method' do
         expect(assigns(:service_request)).to respond_to(:create_line_items_for_service)
+      end
+
+      it 'calls the correct ssr method' do
         expect(assigns(:sub_service_request)).to respond_to(:update_cwf_data_for_new_line_item)
       end
 
-      it 'creates the correct line item and assigns the correct attributes' do
-        new_line_item = assigns(:new_line_items).first
-        expect(new_line_item.service_id).to eq(@service.id)
-        expect(new_line_item.service_request_id).to eq(@service_request.id)
-        expect(new_line_item.sub_service_request_id).to eq(@sub_service_request.id)
-        expect(new_line_item.optional).to eq(true)
+      it 'creates a line item with the correct service' do
+        expect(assigns(:new_line_items).first.service_id).to eq(@service.id)
+      end
+
+      it 'creates a line item with the correct service request' do
+        expect(assigns(:new_line_items).first.service_request_id).to eq(@service_request.id)
+      end
+
+      it 'creates a line item with the correct ssr' do
+        expect(assigns(:new_line_items).first.sub_service_request_id).to eq(@sub_service_request.id)
+      end
+
+      it 'creates a line item with the correct optional attribute' do
+        expect(assigns(:new_line_items).first.optional).to eq(true)
       end
     end
 
@@ -83,8 +99,11 @@ RSpec.describe Dashboard::MultipleLineItemsController do
             add_service_id: @service.id
       end
 
-      it 'will fail to create the line items' do
+      it 'produces the correct error' do
         expect(assigns(:errors)).to eq('Test error')
+      end
+
+      it 'does not assign new_line_items' do
         expect(assigns(:new_line_items)).to eq(nil)
       end
     end
