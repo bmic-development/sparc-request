@@ -311,17 +311,22 @@ class SubServiceRequest < ActiveRecord::Base
       editable = EDITABLE_STATUSES[organization_id] || available
       changeable = available & editable
       if changeable.include?(new_status)
-        if (status != new_status) && UPDATABLE_STATUSES.include?(status)
+        #  See Pivotal Stories: #133049647 & #135639799
+        if (status != new_status) && ((new_status == 'submitted' && UPDATABLE_STATUSES.include?(status)) || new_status != 'submitted')
           # Since adding/removing services changes a SSR status to 'draft', we have to look at the past status to see if we should notify users
           # We do NOT notify if updating from an un-updatable status or we're updating to a status that we already were previously 
           # EXAMPLE:  SSR 001 past_status 'get_a_cost_estimate', SSR 001 current status is 'draft' (because we added a new li) 
           # and now we are updating to 'get_a_cost_estimate again'.  We would not want to send an email.
-          past_status = PastStatus.where(sub_service_request_id: id).last
-          past_status = past_status.nil? ? nil : past_status.status
-
-          if status == 'draft' && ((UPDATABLE_STATUSES.include?(past_status) && past_status != new_status) || past_status == nil) # past_status == nil indicates a newly created SSR
-            to_notify << id
-          elsif status != 'draft'
+          if new_status == 'submitted'
+            past_status = PastStatus.where(sub_service_request_id: id).last
+            past_status = past_status.nil? ? nil : past_status.status
+            
+            if status == 'draft' && ((UPDATABLE_STATUSES.include?(past_status) && past_status != new_status) || past_status == nil) # past_status == nil indicates a newly created SSR
+              to_notify << id
+            elsif status != 'draft'
+              to_notify << id 
+            end
+          else
             to_notify << id 
           end
 

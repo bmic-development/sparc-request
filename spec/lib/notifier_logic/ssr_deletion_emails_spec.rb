@@ -54,13 +54,12 @@ RSpec.describe NotifierLogic do
         @destroyed_li_id = li.id
         li.destroy
         @ssr.update_attribute(:status, 'draft')
-        @ssr.destroy
         @sr.reload
         ### DELETES AN ENTIRE SSR AND SETS UP ASSOCIATED AUDIT ###
         delete_entire_ssr(@sr, @ssr, ssr2)
       end
 
-      it 'should not notify authorized users (initial submission email)' do
+      it 'should not notify authorized users (deletion email)' do
         allow(Notifier).to receive(:notify_user) do
           mailer = double('mail') 
           expect(mailer).to receive(:deliver_now)
@@ -71,7 +70,7 @@ RSpec.describe NotifierLogic do
         expect(Notifier).not_to have_received(:notify_user) 
       end
 
-      it 'should notify service providers (initial submission email)' do
+      it 'should notify service providers (deletion email)' do
         allow(Notifier).to receive(:notify_service_provider) do
           mailer = double('mail') 
           expect(mailer).to receive(:deliver_now)
@@ -82,7 +81,7 @@ RSpec.describe NotifierLogic do
         expect(Notifier).to have_received(:notify_service_provider).with(@service_provider, @sr, anything, logged_in_user, @ssr, nil, true, false, false)
       end
 
-      it 'should notify admin (initial submission email)' do
+      it 'should notify admin (deletion email)' do
         allow(Notifier).to receive(:notify_admin) do
           mailer = double('mail') 
           expect(mailer).to receive(:deliver)
@@ -103,14 +102,6 @@ RSpec.describe NotifierLogic do
 
     audit_of_ssr2_create = AuditRecovery.where("auditable_id = '#{ssr2.id}' AND auditable_type = 'SubServiceRequest' AND action = 'create'")
     audit_of_ssr2_create.first.update_attribute(:created_at, Time.now.yesterday.utc - 5.hours)
-
-    ### Deleted SSRs since previously submitted ###
-    deleted_ssrs_since_previous_submission = AuditRecovery.where("audited_changes LIKE '%service_request_id: #{sr.id}%' AND auditable_type = 'SubServiceRequest' AND action = 'destroy' AND created_at BETWEEN '#{Time.now.yesterday.utc}' AND '#{Time.now.utc}'")
-    deleted_ssrs_since_previous_submission.first.update_attribute(:created_at, Time.now.utc - 5.hours)
-    deleted_ssrs_since_previous_submission.first.update_attribute(:user_id, logged_in_user.id)
-    ### Change last status to an 'unupdatable' status ###
-    destroyed_ssr = AuditRecovery.where("auditable_id = #{ssr.id} AND action = 'update'").order(created_at: :desc).first
-    destroyed_ssr.update_attributes(audited_changes: {'status'=>["submitted", "blah"]} )
     ### Deleted LIs since previously submitted ###
     deleted_li = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{ssr.id}%' AND auditable_type = 'LineItem' AND action IN ('destroy')")
     deleted_li.first.update_attribute(:created_at, Time.now.utc - 5.hours)

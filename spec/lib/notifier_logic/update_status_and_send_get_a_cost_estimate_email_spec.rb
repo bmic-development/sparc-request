@@ -324,18 +324,18 @@ RSpec.describe NotifierLogic do
         expect(@notifier_logic).to have_received(:send_user_notifications).with({:request_amendment=>false})
       end
 
-      it 'should send_service_provider_notifications with the updatable SSR equest_amendment=>false' do
+      it 'should send_service_provider_notifications with the updatable SSRs equest_amendment=>false' do
         @notifier_logic =  NotifierLogic.new(@sr, nil, logged_in_user)
         allow(@notifier_logic).to receive(:send_service_provider_notifications)
         @notifier_logic.update_status_and_send_get_a_cost_estimate_email
-        expect(@notifier_logic).to have_received(:send_service_provider_notifications).with([@ssr2],{:request_amendment=>false})
+        expect(@notifier_logic).to have_received(:send_service_provider_notifications).with([@ssr, @ssr2],{:request_amendment=>false})
       end
 
-      it 'should send_admin_notifications with the updatable SSR request_amendment=>false' do
+      it 'should send_admin_notifications with the updatable SSRs request_amendment=>false' do
         @notifier_logic =  NotifierLogic.new(@sr, nil, logged_in_user)
         allow(@notifier_logic).to receive(:send_admin_notifications)
         @notifier_logic.update_status_and_send_get_a_cost_estimate_email
-        expect(@notifier_logic).to have_received(:send_admin_notifications).with([@ssr2],{:request_amendment=>false})
+        expect(@notifier_logic).to have_received(:send_admin_notifications).with([@ssr, @ssr2],{:request_amendment=>false})
       end
     end
   end

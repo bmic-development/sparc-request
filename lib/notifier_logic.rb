@@ -29,7 +29,7 @@ class NotifierLogic
   end
 
   def ssr_deletion_emails(ssr, ssr_destroyed: true, request_amendment: false)
-    if @destroyed_ssrs_needing_notification.present?
+    if @ssrs_updated_from_un_updatable_status.present?
       send_ssr_service_provider_notifications(ssr, ssr_destroyed: true, request_amendment: false)
       send_admin_notifications([ssr], request_amendment: false, ssr_destroyed: true)
     end
