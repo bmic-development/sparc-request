@@ -33,6 +33,7 @@ RSpec.describe ServiceRequest, type: :model do
           protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
           @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
           @ssr_updatable_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: nil)
+          @sr.reload
         end
 
         it "should return the id of the ssr that was not previously submitted" do
@@ -84,6 +85,7 @@ RSpec.describe ServiceRequest, type: :model do
           @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
           @ssr_updatable_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: nil)
           PastStatus.create(sub_service_request_id: @ssr_updatable_status.id, status: 'get_a_cost_estimate')
+          @sr.reload
         end
 
         it "should return the id of the ssr that was not previously submitted" do
@@ -134,6 +136,7 @@ RSpec.describe ServiceRequest, type: :model do
           protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
           @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
           @ssr_updatable_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'get_a_cost_estimate', submitted_at: nil)
+          @sr.reload
         end
 
         it "should return the id of the ssr that was not previously submitted" do
@@ -184,6 +187,7 @@ RSpec.describe ServiceRequest, type: :model do
           protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
           @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
           @ssr_un_updatable_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'un_updatable_status', submitted_at: nil, nursing_nutrition_approved: nil, lab_approved: nil, imaging_approved: nil, committee_approved: nil)
+          @sr.reload
         end
 
         context "updating status to 'get_a_cost_estimate'" do
@@ -257,6 +261,7 @@ RSpec.describe ServiceRequest, type: :model do
           protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
           @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
           @ssr_same_status_as_updated_to_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'submitted', submitted_at: Time.now.yesterday.utc)
+          @sr.reload
         end
 
         it "should return an empty array" do
@@ -288,6 +293,7 @@ RSpec.describe ServiceRequest, type: :model do
           protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
           @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
           @ssr_with_submitted_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'submitted', submitted_at: Time.now.yesterday.utc)
+          @sr.reload
         end
 
         context "updating status to 'get_a_cost_estimate'" do
@@ -342,6 +348,7 @@ RSpec.describe ServiceRequest, type: :model do
         protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol: protocol, submitted_at: Time.now.yesterday.utc)
         @ssr_updatable_status   = create(:sub_service_request_without_validations, service_request: @sr, organization: @org, status: 'draft', submitted_at: Time.now.yesterday.utc)
+        @sr.reload
       end
 
       it "should return the id of the ssr that was not previously submitted" do
@@ -367,7 +374,7 @@ RSpec.describe ServiceRequest, type: :model do
         protocol    = create(:protocol_federally_funded, primary_pi: identity, type: 'Study')
         @sr          = create(:service_request_without_validations, protocol_id: protocol.id, submitted_at: Time.now.yesterday.utc)
         @ssr_updatable_status   = create(:sub_service_request, service_request_id: @sr.id, organization_id: @org.id, status: 'draft', submitted_at: Time.now.yesterday.utc)
-        binding.pry
+        @sr.reload
         PastStatus.create(sub_service_request_id: @ssr_updatable_status.id, status: 'get_a_cost_estimate')
       end
 

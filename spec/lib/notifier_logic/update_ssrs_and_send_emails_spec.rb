@@ -51,6 +51,7 @@ RSpec.describe NotifierLogic do
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         new_sr(@sr, @ssr, @ssr2)
+        @sr.reload
       end
 
       it 'should notify authorized users (initial submission email)' do
@@ -140,6 +141,7 @@ RSpec.describe NotifierLogic do
         @deleted_li = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{ssr.id}%' AND auditable_type = 'LineItem' AND action IN ('destroy')")
         @deleted_li.first.update_attribute(:created_at, Time.now.utc - 5.hours)
         @deleted_li.first.update_attribute(:user_id, logged_in_user.id)
+        @sr.reload
       end
 
       it 'should notify authorized users' do
@@ -212,6 +214,7 @@ RSpec.describe NotifierLogic do
         li          = create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
                       create(:service_provider, identity: logged_in_user, organization: @org)
+        @sr.reload 
         add_li_creating_a_new_ssr_then_delete_li_destroying_ssr(@sr, ssr, @ssr2)   
       end
 
@@ -289,7 +292,7 @@ RSpec.describe NotifierLogic do
         li          = create(:line_item, service_request: @sr, sub_service_request: ssr, service: service)
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
-
+        @sr.reload
         add_li_adding_a_new_ssr(@sr, ssr, @ssr2) 
 
         @added_li = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{@ssr2.id}%' AND auditable_type = 'LineItem' AND action IN ('create')")
@@ -373,11 +376,10 @@ RSpec.describe NotifierLogic do
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         li_2        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
-        @ssr2.update_attributes(status: 'submitted', submitted_at: Time.now.yesterday.utc)
-        @ssr2.update_attributes(status: 'draft')
-
+        
+        @ssr2.update_attribute(:status, 'draft')
+        @sr.reload
         add_li_to_exisiting_ssr(@sr, ssr, @ssr2, li_2)
-
         @added_li = AuditRecovery.where("auditable_id = '#{li_2.id}' AND auditable_type = 'LineItem' AND action IN ('create')")
         @added_li.first.update_attribute(:created_at, Time.now.yesterday.utc + 5.hours)
         @added_li.first.update_attribute(:user_id, logged_in_user.id)
@@ -552,7 +554,7 @@ RSpec.describe NotifierLogic do
         li_2        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
 
         destroyed_li_id = li_2.id
-        @ssr2.update_attributes(status: 'submitted', submitted_at: Time.now.yesterday.utc + 1.hours)
+        
         li_2.destroy
         @ssr2.update_attribute(:status, 'draft')
         @sr.reload
@@ -631,8 +633,8 @@ RSpec.describe NotifierLogic do
     sr.reload
     updated_ssr = AuditRecovery.where("auditable_id = #{ssr2.id} AND action = 'update'")
     updated_ssr.first.update_attribute(:created_at, Time.now.utc - 5.minutes)
-    # destroyed_ssr = AuditRecovery.where("audited_changes LIKE '%sub_service_request_id: #{ssr2.id}%' AND action = 'destroy'")
     sr.previous_submitted_at = sr.submitted_at
+    sr.reload
   end
 
   def delete_entire_ssr(sr, ssr, ssr2)
@@ -677,8 +679,10 @@ RSpec.describe NotifierLogic do
     audit_of_ssr2_create = AuditRecovery.where("auditable_id = '#{ssr2.id}' AND auditable_type = 'SubServiceRequest' AND action = 'create'")
     audit_of_ssr2_create.first.update_attribute(:created_at, Time.now.yesterday.utc - 5.hours)
 
-    submitted_at_ssr2 = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{ssr2.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update')").order(created_at: :desc).first
-    submitted_at_ssr2.update_attribute(:user_id, logged_in_user.id)
+    # submitted_at_ssr2 = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{ssr2.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update')").order(created_at: :desc).first
+
+    AuditRecovery.create(auditable_id: ssr2.id, auditable_type: 'SubServiceRequest', action:  'update', audited_changes: {"submitted_at"=>[Time.now.yesterday.utc, Time.now.yesterday.utc + 1.hours]}, user_id: logged_in_user.id, created_at: Time.now.utc - 5.minutes)
+
     sr.previous_submitted_at = sr.submitted_at
   end
 
@@ -709,8 +713,8 @@ RSpec.describe NotifierLogic do
     added_li.first.update_attribute(:created_at, Time.now.yesterday.utc - 1.hours)
     added_li.first.update_attribute(:user_id, logged_in_user.id)
 
-    submitted_at_ssr2 = AuditRecovery.where("audited_changes LIKE '%submitted_at%' AND auditable_id = #{ssr2.id} AND auditable_type = 'SubServiceRequest' AND action IN ('update')").order(created_at: :desc).first
-    submitted_at_ssr2.update_attribute(:user_id, logged_in_user.id)
+    AuditRecovery.create(auditable_id: ssr2.id, auditable_type: 'SubServiceRequest', action:  'update', audited_changes: {"submitted_at"=>[Time.now.yesterday.utc, Time.now.yesterday.utc + 1.hours]}, user_id: logged_in_user.id, created_at: Time.now.utc - 5.minutes)
+
     sr.previous_submitted_at = sr.submitted_at
   end
 

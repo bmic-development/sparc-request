@@ -51,6 +51,7 @@ RSpec.describe NotifierLogic do
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
+        @sr.reload
       end
 
       it 'should notify authorized users (initial submission email)' do
@@ -128,6 +129,7 @@ RSpec.describe NotifierLogic do
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
                       create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
+        @sr.reload
       end
 
       it 'NO EMAILS SENT' do
@@ -205,6 +207,7 @@ RSpec.describe NotifierLogic do
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
+        @sr.reload
       end
 
       it 'should notify authorized users (initial submission email)' do
@@ -282,6 +285,7 @@ RSpec.describe NotifierLogic do
         li_1        = create(:line_item, service_request: @sr, sub_service_request: @ssr2, service: service)
         @service_provider = create(:service_provider, identity: logged_in_user, organization: @org)
         @sr.previous_submitted_at = @sr.submitted_at
+        @sr.reload
       end
 
       it 'should notify authorized users (initial submission email)' do
