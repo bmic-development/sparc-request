@@ -432,7 +432,7 @@ class ServiceRequest < ActiveRecord::Base
 
   # Change the status of the service request and all the sub service
   # requests to the given status.
-  def update_status(new_status, use_validation=true)
+  def update_status(new_status)
     to_notify = []
     update_attribute(:status, new_status)
     sub_service_requests.each do |ssr|
