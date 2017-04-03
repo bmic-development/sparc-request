@@ -24,6 +24,7 @@ class SubServiceRequest < ApplicationRecord
 
   audited
 
+  before_create :set_protocol_id
   after_save :update_org_tree
   after_save :update_past_status
 
@@ -31,6 +32,7 @@ class SubServiceRequest < ApplicationRecord
   belongs_to :owner, :class_name => 'Identity', :foreign_key => "owner_id"
   belongs_to :service_request
   belongs_to :organization
+  belongs_to :protocol
   has_many :past_statuses, :dependent => :destroy
   has_many :line_items, :dependent => :destroy
   has_many :line_items_visits, through: :line_items
@@ -44,7 +46,6 @@ class SubServiceRequest < ApplicationRecord
   has_many :subsidies
   has_one :approved_subsidy, :dependent => :destroy
   has_one :pending_subsidy, :dependent => :destroy
-  has_one :protocol, through: :service_request
 
   delegate :percent_subsidy, to: :approved_subsidy, allow_nil: true
 
@@ -111,7 +112,7 @@ class SubServiceRequest < ApplicationRecord
   end
 
   def display_id
-    return "#{service_request.try(:protocol).try(:id)}-#{ssr_id || 'DRAFT'}"
+    return "#{protocol.try(:id)}-#{ssr_id || 'DRAFT'}"
   end
 
   def has_subsidy?
@@ -257,13 +258,13 @@ class SubServiceRequest < ApplicationRecord
 
   def eligible_for_subsidy?
     # This defines when subsidies show up for SubServiceRequests across the app.
-    if organization.eligible_for_subsidy? and not organization.funding_source_excluded_from_subsidy?(self.service_request.protocol.try(:funding_source_based_on_status))
+    if organization.eligible_for_subsidy? and not organization.funding_source_excluded_from_subsidy?(self.protocol.try(:funding_source_based_on_status))
       true
     else
       false
     end
   end
-
+  
   ###############################################################################
   ######################## FULFILLMENT RELATED METHODS ##########################
   ###############################################################################
