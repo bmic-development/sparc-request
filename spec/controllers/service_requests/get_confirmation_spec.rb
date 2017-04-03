@@ -48,7 +48,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
       service  = create(:service, organization: org, one_time_fee: true)
       protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
       sr       = create(:service_request_without_validations, protocol: protocol, submitted_at: '2015-06-01')
-      ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org)
+      ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, protocol_id: protocol.id)
       li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
       session[:identity_id]        = logged_in_user.id
@@ -67,7 +67,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
         service  = create(:service, organization: org, one_time_fee: true)
         protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         sr       = create(:service_request_without_validations, protocol: protocol)
-        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
         li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
         session[:identity_id]            = logged_in_user.id
@@ -89,7 +89,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
         service  = create(:service, organization: org, one_time_fee: true)
         protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         sr       = create(:service_request_without_validations, protocol: protocol)
-        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
         li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
         session[:identity_id]            = logged_in_user.id
@@ -109,7 +109,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
           service  = create(:service, organization: org, one_time_fee: true, send_to_epic: true)
           protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study', selected_for_epic: true)
           sr       = create(:service_request_without_validations, protocol: protocol)
-          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
           li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
           session[:identity_id]            = logged_in_user.id
@@ -133,7 +133,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
           service  = create(:service, organization: org, one_time_fee: true, send_to_epic: true)
           protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study', selected_for_epic: true)
           sr       = create(:service_request_without_validations, protocol: protocol)
-          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
           li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
                      create(:service_provider, identity: logged_in_user, organization: org)
 
@@ -158,13 +158,13 @@ RSpec.describe ServiceRequestsController, type: :controller do
         service  = create(:service, organization: org, one_time_fee: true)
         protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         sr       = create(:service_request_without_validations, protocol: protocol, submitted_at: nil)
-        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
         li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
                    create(:service_provider, identity: logged_in_user, organization: org)
 
         session[:identity_id]        = logged_in_user.id
         time                         = Time.parse('2016-06-01 12:34:56')
-        
+
         Timecop.freeze(time) do
           xhr :get, :confirmation, {
             id: sr.id
@@ -178,7 +178,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
         service  = create(:service, organization: org, one_time_fee: true)
         protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
         sr       = create(:service_request_without_validations, protocol: protocol)
-        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+        ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
         li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
                    create(:service_provider, identity: logged_in_user, organization: org)
 
@@ -201,7 +201,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
           service  = create(:service, organization: org, one_time_fee: true, send_to_epic: true)
           protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study', selected_for_epic: true)
           sr       = create(:service_request_without_validations, protocol: protocol)
-          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
           li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
           session[:identity_id]            = logged_in_user.id
@@ -224,7 +224,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
           service  = create(:service, organization: org, one_time_fee: true, send_to_epic: true)
           protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study', selected_for_epic: true)
           sr       = create(:service_request_without_validations, protocol: protocol)
-          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft')
+          ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, status: 'draft', protocol_id: protocol.id)
           li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
                      create(:service_provider, identity: logged_in_user, organization: org)
 
@@ -248,7 +248,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
       service  = create(:service, organization: org, one_time_fee: true)
       protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
       sr       = create(:service_request_without_validations, protocol: protocol)
-      ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org)
+      ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, protocol_id: protocol.id)
       li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
       session[:identity_id]        = logged_in_user.id
@@ -265,7 +265,7 @@ RSpec.describe ServiceRequestsController, type: :controller do
       service  = create(:service, organization: org, one_time_fee: true)
       protocol = create(:protocol_federally_funded, primary_pi: logged_in_user, type: 'Study')
       sr       = create(:service_request_without_validations, protocol: protocol)
-      ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org)
+      ssr      = create(:sub_service_request_without_validations, service_request: sr, organization: org, protocol_id: protocol.id)
       li       = create(:line_item, service_request: sr, sub_service_request: ssr, service: service)
 
       session[:identity_id]        = logged_in_user.id

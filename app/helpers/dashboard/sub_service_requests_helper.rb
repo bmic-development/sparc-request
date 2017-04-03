@@ -34,7 +34,7 @@ module Dashboard::SubServiceRequestsHelper
   end
 
   def full_ssr_id(ssr)
-    protocol = ssr.service_request.protocol
+    protocol = ssr.protocol
     if protocol
       "#{protocol.id}-#{ssr.ssr_id}"
     else
@@ -263,4 +263,21 @@ module Dashboard::SubServiceRequestsHelper
       ''
     end
   end
+
+  def ssr_select_options(ssr)
+    ssr.nil? ? [] : statuses_with_classes(ssr)
+  end
+
+  private
+
+  def statuses_with_classes(ssr)
+    ssr.organization.get_available_statuses.invert.map do |status|
+      if status.include?('Complete') || status.include?('Withdrawn')
+        status.push(:class=> 'finished-status')
+      else
+        status
+      end
+    end
+  end
 end
+

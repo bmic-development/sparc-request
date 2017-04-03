@@ -24,7 +24,6 @@ RSpec.describe ServiceRequest, type: :model do
   let_there_be_j
 
   describe "#update_status" do
-      
     context "new_status.to eq('submitted')" do
       context "current status is updatable ('draft') and past_status is nil indicating a newly created SSR" do
         before :each do

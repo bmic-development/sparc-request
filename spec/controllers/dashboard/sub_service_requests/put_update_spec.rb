@@ -32,7 +32,7 @@ RSpec.describe Dashboard::SubServiceRequestsController do
       @service_request      = create(:service_request_without_validations, protocol: @protocol)
       @organization         = create(:organization)
       @survey = create(:survey, access_code: 'sctr-customer-satisfaction-survey')
-      @sub_service_request  = create(:sub_service_request_without_validations, service_request: @service_request, organization: @organization, service_requester_id:  service_requester.id)
+      @sub_service_request  = create(:sub_service_request_without_validations, service_request: @service_request, organization: @organization, service_requester_id:  service_requester.id, protocol_id: @protocol.id)
     end
 
     #####AUTHORIZATION#####
@@ -41,7 +41,7 @@ RSpec.describe Dashboard::SubServiceRequestsController do
         before :each do
           create(:super_user, identity: @logged_in_user, organization: @organization)
 
-          put :update, id: @sub_service_request.id, format: :js
+          put :update, id: @sub_service_request.id, sub_service_request: { lab_approved: true }, format: :js
         end
 
         it { is_expected.to render_template "dashboard/sub_service_requests/update" }
@@ -62,7 +62,7 @@ RSpec.describe Dashboard::SubServiceRequestsController do
     context 'instance variables' do
       before :each do
         create(:super_user, identity: @logged_in_user, organization: @organization)
-        put :update, id: @sub_service_request.id, format: :js
+        put :update, id: @sub_service_request.id, sub_service_request: { lab_approved: true }, format: :js
       end
 
       it 'should assign instance variables' do
@@ -77,11 +77,14 @@ RSpec.describe Dashboard::SubServiceRequestsController do
 
     #####SURVEYS#####
     context 'ssr status is complete' do
-      it 'should distribute surveys' do 
+      it 'should distribute surveys' do
         create(:super_user, identity: @logged_in_user, organization: @organization)
         @service         = create(:service_without_validations, organization_id:  @organization.id)
-        @line_item      = create(:line_item_without_validations, service_request_id: @service_request.id,                          service_id:  @service.id,
-                                    sub_service_request_id: @sub_service_request.id)
+        @line_item      = create(:line_item_without_validations,
+                                 service_request_id: @service_request.id,
+                                 service_id:  @service.id,
+                                 sub_service_request_id: @sub_service_request.id
+                                )
         @organization.associated_surveys.create survey_id: @survey.id
 
         expect_any_instance_of(SubServiceRequest).to receive(:distribute_surveys)
@@ -94,8 +97,10 @@ RSpec.describe Dashboard::SubServiceRequestsController do
         it 'should not distribute surveys' do
           create(:super_user, identity: @logged_in_user, organization: @organization)
           @service         = create(:service_without_validations, organization_id:  @organization.id)
-          @line_item      = create(:line_item_without_validations, service_request_id: @service_request.id,                          service_id:  @service.id,
-                                      sub_service_request_id: @sub_service_request.id)
+          @line_item      = create(:line_item_without_validations,
+                                   service_request_id: @service_request.id,
+                                   service_id:  @service.id,
+                                   sub_service_request_id: @sub_service_request.id)
           @organization.associated_surveys.create survey_id: @survey.id
 
           expect_any_instance_of(SubServiceRequest).to_not receive(:distribute_surveys)

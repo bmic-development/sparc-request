@@ -138,11 +138,11 @@ class NotifierLogic
   end
 
   def send_notifications(sub_service_requests)
-    # If user has added a new service related to a new ssr and edited an existing ssr, 
+    # If user has added a new service related to a new ssr and edited an existing ssr,
     # we only want to send a request amendment email and not an initial submit email
     send_user_notifications(request_amendment: false) unless @send_request_amendment_and_not_initial
-    send_admin_notifications(sub_service_requests, request_amendment: false) 
-    send_service_provider_notifications(sub_service_requests, request_amendment: false) 
+    send_admin_notifications(sub_service_requests, request_amendment: false)
+    send_service_provider_notifications(sub_service_requests, request_amendment: false)
   end
 
   def send_user_notifications(request_amendment: false)

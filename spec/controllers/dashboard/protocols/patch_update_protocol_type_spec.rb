@@ -27,7 +27,9 @@ RSpec.describe Dashboard::ProtocolsController do
         before(:each) do
           @logged_in_user = build_stubbed(:identity)
           @protocol = findable_stub(Protocol) do
-            build_stubbed(:protocol)
+            stub = build_stubbed(:protocol)
+            allow(stub).to receive(:becomes).and_return(stub)
+            stub
           end
           authorize(@logged_in_user, @protocol, can_edit: false)
           log_in_dashboard_identity(obj: @logged_in_user)
@@ -50,7 +52,9 @@ RSpec.describe Dashboard::ProtocolsController do
           @study_type_question_group_version_3 = StudyTypeQuestionGroup.create(active: true, version: 3)
           study_type_question_group_version_2 = StudyTypeQuestionGroup.create(active: false, version: 2)
           @protocol = findable_stub(Protocol) do
-            build_stubbed(:protocol, type: "Study", study_type_question_group_id: study_type_question_group_version_2.id)
+            stub = build_stubbed(:protocol, type: "Study", study_type_question_group_id: study_type_question_group_version_2.id)
+            allow(stub).to receive(:becomes).and_return(stub)
+            stub
           end
           allow(@protocol).to receive(:update_attribute)
           allow(@protocol).to receive(:populate_for_edit)
@@ -102,7 +106,7 @@ RSpec.describe Dashboard::ProtocolsController do
           @protocol       = create(:protocol_without_validations, type: 'Project', study_type_question_group_id: study_type_question_group_version_3.id)
           organization    = create(:organization)
           service_request = create(:service_request_without_validations, protocol: @protocol)
-                            create(:sub_service_request_without_validations, organization: organization, service_request: service_request, status: 'draft')
+                            create(:sub_service_request_without_validations, organization: organization, service_request: service_request, status: 'draft', protocol_id: @protocol.id)
                             create(:super_user, identity: @logged_in_user, organization: organization)
 
           log_in_dashboard_identity(obj: @logged_in_user)
@@ -124,7 +128,7 @@ RSpec.describe Dashboard::ProtocolsController do
           @protocol       = create(:protocol_without_validations, type: 'Project', study_type_question_group_id: study_type_question_group_version_3.id)
           organization    = create(:organization)
           service_request = create(:service_request_without_validations, protocol: @protocol)
-                            create(:sub_service_request_without_validations, organization: organization, service_request: service_request, status: 'draft')
+                            create(:sub_service_request_without_validations, organization: organization, service_request: service_request, status: 'draft', protocol_id: @protocol.id)
                             create(:service_provider, identity: @logged_in_user, organization: organization)
 
           log_in_dashboard_identity(obj: @logged_in_user)
