@@ -22,13 +22,16 @@
 
 .calendar-container
   width: 100%
-
+  .wid
+    width: 5%
   .panel-title
     width: 100%
 
   .table-bordered
-    height: 100%
     thead
+      display: table
+      width: 100%
+      table-layout: fixed
       tr:not(:first-child)
         border-bottom: 1px solid #ddd
       th
@@ -41,11 +44,14 @@
         width: 5%
       .popover
         color: black
-    tbody
+    tbody 
+      td.checkboxes,
+      td.subject-count
+        width: 5%
       td.unit-type-number,
       td.qty-type-number
         height: 100%
-        padding: 0
+        padding: 0 5px
         .unit-type,
         .units-per-qty,
         .qty-type,
@@ -57,6 +63,11 @@
           border-right: 1px solid #DDD
       .organization-header
         background: #CCC
+  .scrolling-div
+    display: block
+    overflow: auto
+    height: 100%
+    max-height: 250px !important
 
 .service-calendar-row,
 .service-calendar-column

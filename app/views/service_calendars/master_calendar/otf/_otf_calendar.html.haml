@@ -26,7 +26,7 @@
       = render 'service_calendars/master_calendar/otf/otf_header', tab: tab,
         service_request: service_request, sub_service_request: sub_service_request,
         review: review, portal: portal
-    %tbody
+    %tbody.scrolling-div
       = render 'service_calendars/master_calendar/otf/otf_line_items', tab: tab,
         service_request: service_request, sub_service_request: sub_service_request,
         review: review, portal: portal, admin: admin, merged: merged,
