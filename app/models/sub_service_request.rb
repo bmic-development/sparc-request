@@ -293,6 +293,7 @@ class SubServiceRequest < ApplicationRecord
       changeable = available & editable
       if changeable.include?(new_status)
         #  See Pivotal Stories: #133049647 & #135639799
+        binding.pry
         if (status != new_status) && ((new_status == 'submitted' && UPDATABLE_STATUSES.include?(status)) || new_status != 'submitted')
           ### For 'submitted' status ONLY:
           # Since adding/removing services changes a SSR status to 'draft', we have to look at the past status to see if we should notify users of a status change
