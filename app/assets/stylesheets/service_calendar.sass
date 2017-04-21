@@ -42,25 +42,36 @@
     width: 100%
 
   .table-bordered
-    height: 100%
     thead
+      display: table
+      width: 100%
+      table-layout: fixed
       tr:not(:first-child)
         border-bottom: 1px solid #ddd
       th
         border-bottom: 0
       th.service-header
-        width: 12%
+        width: 12.5%
       th.subject-count-header
-        width: 6%
-      th.select-row-header
         width: 5%
+      th.unit-cost-header
+        width: 17%
+      th.notes-header
+        width: 9%
+      th.status-header-dashboard
+        width: 7%
+      th.status-header-proper
+        width: 10%
       .popover
         color: black
     tbody
+      td.checkboxes,
+      td.subject-count
+        width: 5%
       td.unit-type-number,
       td.qty-type-number
         height: 100%
-        padding: 0
+        padding: 0 5px
         .unit-type,
         .units-per-qty,
         .qty-type,
@@ -72,6 +83,12 @@
           border-right: 1px solid #DDD
       .organization-header
         background: #CCC
+
+    .scrolling-div
+      display: block
+      overflow: auto
+      height: 100%
+      max-height: 250px !important
 
 .service-calendar-row,
 .service-calendar-column

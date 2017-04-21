@@ -63,4 +63,4 @@
             data: { id: visit_group.id, service_request_id: service_request.id, arm_id: visit_group.arm.id, toggle: 'tooltip', placement: 'top', delay: '{"show":"500"}' },
             class: 'edit-visit-group', title: t(:calendars)[:tooltips][:visit_name]
 - (visit_groups.size...Visit.per_page).each do |index|
-  %th.col-sm-1.text-center
+  %th.text-center
