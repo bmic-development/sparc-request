@@ -40,38 +40,51 @@
 
   .panel-title
     width: 100%
-
+  
   .table-bordered
-    height: 100%
+    .non-scrolling-table
+      height: 100%
     thead
+    .scrolling-thead
+      display: table
+      width: 100%
+      table-layout: fixed
+      border-bottom: 2px solid #DDD
       tr:not(:first-child)
         border-bottom: 1px solid #ddd
       th
         border-bottom: 0
-      th.service-header
-        width: 12%
-      th.subject-count-header
-        width: 6%
-      th.select-row-header
-        width: 5%
+      th.template-service-header
+        width: 12.5%
+      th.template-header-width
+        width: 10%
+      th.billing-service-header
+        width: 11.5%
+      th.billing-header-width
+        width: 9%
+      th.consolidated-service-header
+        width: 11.5%
+      th.consolidated-header-width
+        width: 9%
+
       .popover
         color: black
     tbody
+
       td.unit-type-number,
       td.qty-type-number
         height: 100%
         padding: 0
-        .unit-type,
-        .units-per-qty,
-        .qty-type,
-        .qty
-          height: 100%
-          padding: 8px 15px
-        .unit-type.col-sm-6,
         .qty-type
           border-right: 1px solid #DDD
       .organization-header
         background: #CCC
+    .scrolling-div
+      display: block
+      overflow: auto
+      height: 100%
+      max-height: 250px !important
+
 
 .service-calendar-row,
 .service-calendar-column
