@@ -345,6 +345,19 @@ class Organization < ApplicationRecord
     return all_super_users.flatten.uniq {|x| x.identity_id}
   end
 
+  def setup_available_statuses
+    position = 1
+    obj_names = AvailableStatus::TYPES.map{ |k,v| k }
+    obj_names.each do |obj_name|
+      available_status = available_statuses.detect { |obj| obj.status == obj_name }
+      available_status = available_statuses.build(status: obj_name, new: true) unless available_status
+      available_status.position = position
+      position += 1
+    end
+
+    available_statuses.sort{|a, b| a.position <=> b.position}
+  end
+
   def get_available_statuses
     tmp_available_statuses = self.available_statuses.reject{|status| status.new_record?}
     statuses = []
