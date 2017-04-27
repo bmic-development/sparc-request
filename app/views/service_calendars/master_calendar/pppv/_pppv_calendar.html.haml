@@ -29,13 +29,13 @@
           = t(:proper)[:service_calendar][:move_visit][:header]
     .clearfix
   = hidden_field_tag :service_request_id, service_request.id
-  %table.table.table-bordered{ class: (Dashboard::ServiceCalendars.pppv_line_items_visits_to_display(arm, service_request, sub_service_request, merged: merged, statuses_hidden: statuses_hidden).count > 4) ? "" : "non-scrolling-table"}
-    %thead{ class: (Dashboard::ServiceCalendars.pppv_line_items_visits_to_display(arm, service_request, sub_service_request, merged: merged, statuses_hidden: statuses_hidden)).count > 4 ? "scrolling-thead" : "" }
+  %table.table.table-bordered{ class: (Dashboard::ServiceCalendars.pppv_line_items_visits_to_display(arm, service_request, sub_service_request, merged: merged, statuses_hidden: statuses_hidden).map{|x| x.last}.flatten.count) > 5 ? "" : "non-scrolling-table"}
+    %thead{ class: (Dashboard::ServiceCalendars.pppv_line_items_visits_to_display(arm, service_request, sub_service_request, merged: merged, statuses_hidden: statuses_hidden).map{|x| x.last}.flatten.count) > 5 ? "scrolling-thead" : "" }
       = render "service_calendars/master_calendar/pppv/#{tab}_header",
         service_request: service_request, sub_service_request: sub_service_request,
         arm: arm, tab: tab, pages: pages, page: page, review: review,
         portal: portal, visit_groups: visit_groups, admin: admin
-    %tbody{ class: (Dashboard::ServiceCalendars.pppv_line_items_visits_to_display(arm, service_request, sub_service_request, merged: merged, statuses_hidden: statuses_hidden)).count > 4 ? "scrolling-div" : "" }
+    %tbody{ class: (Dashboard::ServiceCalendars.pppv_line_items_visits_to_display(arm, service_request, sub_service_request, merged: merged, statuses_hidden: statuses_hidden).map{|x| x.last}.flatten.count) > 5 ? "scrolling-div" : "" }
       = render "service_calendars/master_calendar/pppv/#{tab}_line_items",
         service_request: service_request, sub_service_request: sub_service_request,
         arm: arm, tab: tab, pages: pages, page: page, review: review, portal: portal,
