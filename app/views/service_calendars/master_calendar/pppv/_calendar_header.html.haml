@@ -20,19 +20,19 @@
 %tr
   %th.consolidated-service-header.text-center{ colspan: 2, rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:service]
-  %th.consolidated-header-width.col-sm-1.text-center{ rowspan: 2 }
+  %th.consolidated-notes.col-sm-1.text-center{ rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:notes]
-  %th.consolidated-header-width.col-sm-1.text-center{ rowspan: 2 }
+  %th.consolidated-status.col-sm-1.text-center{ rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:status]
-  %th.col-sm-2.text-center{ colspan: 2 }
+  %th.consolidated-unit-cost.col-sm-2.text-center{ colspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:unit_cost]
-  %th.col-sm-1.text-center{ rowspan: 2 }
+  %th.consolidated-quantity-type.text-center{ rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:quantity_type]
-  %th.col-sm-1.text-center{ rowspan: 2 }
+  %th.consolidated-number.text-center{ rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:subject_count]
   %th.col-sm-5.text-center.visit-group-select{ colspan: 5 }
     = render 'service_calendars/master_calendar/pppv/visit_group_page_select', service_request: service_request, sub_service_request: sub_service_request, arm: arm, tab: tab, page: page, pages: pages, review: review, portal: portal, admin: admin
-  %th.col-sm-1.text-center{ rowspan: 2 }
+  %th.consolidated-total-per-patient.text-center{ rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:total_per_patient]
   %th.col-sm-1.text-center{ rowspan: 2 }
     = t(:calendars)[:pppv][:header_fields][:total_per_study]

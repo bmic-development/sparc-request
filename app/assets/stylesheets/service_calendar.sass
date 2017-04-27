@@ -37,10 +37,17 @@
       color: grey
     .badge
       background-color: grey
+  .notes.btn-link
+    padding: 0px
 
   .panel-title
     width: 100%
-  
+
+  .service-calendar-row.btn-xs,
+  .service-calendar-column.btn-xs
+    padding: 0px 2px
+
+
   .table-bordered
     .non-scrolling-table
       height: 100%
@@ -55,26 +62,84 @@
       th
         border-bottom: 0
       th.template-service-header
-        width: 12.5%
-      th.template-header-width
-        width: 10%
-      th.billing-service-header
-        width: 11.5%
-      th.billing-header-width
-        width: 9%
-      th.consolidated-service-header
-        width: 11.5%
-      th.consolidated-header-width
-        width: 9%
+        width: 25%
+      th.template-notes-header
+        width: 6%
+      th.template-number
+        width: 4%
+      th.template-blank
+        width: 4%
 
+      th.billing-service-header
+        width: 25.5%
+      th.billing-notes-header
+        width: 5.5%
+      th.billing-status
+        width: 8.5%
+      th.billing-unit-cost
+        width: 16%
+      th.billing-quantity-type
+        width: 7.5%
+      th.billing-number
+        width: 4%
+      th.billing-total-per-patient
+        width: 7.5%
+
+      th.consolidated-service-header
+        width: 25.5%
+      th.consolidated-notes
+        width: 5.5%
+      th.consolidated-status
+        width: 8.5%
+      th.consolidated-unit-cost
+        width: 16%
+      th.consolidated-quantity-type
+        width: 7.5%
+      th.consolidated-number
+        width: 4%
+      th.consolidated-total-per-patient
+        width: 7.5%
+
+      th.visit-group-box
+        width: 6%
+      th.visit-group-select
+        width: 46.1%
+      th.total-per-study
+        width: 9.6%
+      th.visit-group-header
+        width: 43.5%
       .popover
         color: black
     tbody
+      td.service-name
+        width: 25%
+      td.notes
+      td.subject-count
+        width: 3.5%
+      td.checkbox-vertical
+        width: 3.5%
+      td.status
+        width: 6.5%
+      td.service-rate
+        width: 6.5%
+      td.your-cost
+        width: 6.5%
+      td.unit-type
+        width: 6.5%
 
+
+      
       td.unit-type-number,
       td.qty-type-number
         height: 100%
-        padding: 0
+        padding: 0 5px
+        .unit-type,
+        .units-per-qty,
+        .qty-type,
+        .qty
+          height: 100%
+          padding: 8px 15px
+        .unit-type.col-sm-6,
         .qty-type
           border-right: 1px solid #DDD
       .organization-header
@@ -83,7 +148,7 @@
       display: block
       overflow: auto
       height: 100%
-      max-height: 250px !important
+      max-height: 450px !important
 
 
 .service-calendar-row,

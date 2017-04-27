@@ -53,6 +53,16 @@ module ServiceCalendarHelper
     end
   end
 
+  def line_item_count(service_request)
+    @line_items = []
+    service_request.service_list(true).each do |_, value|
+      value[:line_items].group_by(&:sub_service_request_id).each do |sub_service_request_id, line_items|
+        @line_items << line_items
+      end
+    end
+    @line_items.flatten.count
+  end
+
   def display_your_cost line_item
     currency_converter(line_item.applicable_rate)
   end
