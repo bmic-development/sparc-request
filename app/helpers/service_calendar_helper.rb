@@ -40,6 +40,17 @@ module ServiceCalendarHelper
     raw(content_tag(:button, raw(content_tag(:span, '', class: "glyphicon glyphicon-list-alt note-icon #{has_notes ? "blue-note" : "black-note"}", aria: {hidden: "true"}))+raw(content_tag(:span, li.notes.count, class: "#{has_notes ? "badge blue-badge" : "badge"}", id: "lineitem_#{li.id}_notes")), type: 'button', class: 'btn btn-link form-control actions-button notes', data: {notable_id: li.id, notable_type: "LineItem", in_dashboard: portal}))
   end
 
+  def display_unit_type(liv)
+    unit_type = liv.line_item.service.displayed_pricing_map.unit_type
+    if unit_type.include?("/")
+      unit_type = unit_type.split("/")
+      unit_type = unit_type.first + "/" + " " + unit_type.last
+    else
+      unit_type
+    end
+    unit_type
+  end
+
   def notable_type_is_related_to_li_or_liv(notable_type)
     notable_type == "LineItemsVisit" || notable_type == "LineItem"
   end

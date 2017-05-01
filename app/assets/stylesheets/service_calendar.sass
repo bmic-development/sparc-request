@@ -49,111 +49,55 @@
 
 
   .table-bordered
+    width: 100%
     .non-scrolling-table
       height: 100%
-    thead
-    .scrolling-thead
+    thead, tbody tr
       display: table
       width: 100%
       table-layout: fixed
+    thead
+      width: calc( 100% - 1em )
+    .scrolling-thead
       border-bottom: 2px solid #DDD
       tr:not(:first-child)
         border-bottom: 1px solid #ddd
       th
         border-bottom: 0
-
-      th.template-otf-service-header
-        width: 25%
-
-      th.template-otf-unit-type
-        
-
       th.template-service-header
-        width: 25%
-      th.template-notes-header
-        width: 6%
-      th.template-number
-        width: 4%
-      th.template-blank
-        width: 4%
-
-      th.billing-service-header
-        width: 25.5%
-      th.billing-notes-header
-        width: 5.5%
-      th.billing-status
-        width: 8.5%
-      th.billing-unit-cost
-        width: 16%
-      th.billing-quantity-type
-        width: 7.5%
-      th.billing-number
-        width: 4%
-      th.billing-total-per-patient
-        width: 7.5%
-
-      th.consolidated-service-header
-        width: 25.5%
-      th.portal-consolidated-service-header
-        width: 27%
-      th.consolidated-notes
-        width: 5.5%
-      th.consolidated-status
-        width: 8.5%
-      th.consolidated-unit-cost
-        width: 16%
-      th.consolidated-quantity-type
-        width: 7.5%
-      th.consolidated-number
-        width: 4%
-      th.consolidated-total-per-patient
-        width: 7.5%
-
-      th.visit-group-box
-        width: 6%
-      th.visit-group-select
-        width: 46.1%
-      th.total-per-study
-        width: 9.6%
-      th.visit-group-header
-        width: 43.5%
+        width: 20%
+      th.status-width
+        width: 7%
+      th.notes-width
+        width: 4.5%
+      th.smaller-width
+        width: 3.8%
+      th.small-width
+        width: 6.17%
+      th.total-width
+        width: 7%
       .popover
         color: black
     tbody
+      font-size: 13px
       td.service-name
-        width: 25%
-      td.notes
-      td.subject-count
-        width: 3.5%
-      td.checkbox-vertical
-        width: 3.5%
-      td.status
-        width: 6.5%
-      td.service-rate
-        width: 6.5%
-      td.your-cost
-        width: 6.5%
-      td.unit-type
-        width: 6.5%
+        width: 20%
+      td.status-width
+        width: 7%
+      td.notes-width
+        width: 4.5%
+      td.smaller-width
+        width: 3.8%
+      td.small-width
+        min-width: 6.17%
+      td.total-width
+        width: 7%
+      td.max-total-per-patient-width,
+      td.total-per-patient-per-visit-cost-per-study-width,
+        width: 56.5%
 
-      td.otf-status,
-      td.otf-service-rate,
-      td.otf-your-cost
-        width: 8.5%
-      
-      td.unit-type-number,
-      td.qty-type-number
-        height: 100%
-        padding: 0 5px
-        .unit-type,
-        .units-per-qty,
-        .qty-type,
-        .qty
-          height: 100%
-          padding: 8px 15px
-        .unit-type.col-sm-9,
-        .qty-type
-          border-right: 1px solid #DDD
+
+
       .organization-header
         background: #CCC
     .scrolling-div
