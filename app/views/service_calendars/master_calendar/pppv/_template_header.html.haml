@@ -68,7 +68,7 @@
   = render 'service_calendars/master_calendar/pppv/visit_groups', service_request: service_request, arm: arm, tab: tab, visit_groups: visit_groups, portal: portal
 
 %tr
-  %th{ colspan: portal ? 8 : 11 }
+  %th{ colspan: portal ? 10 : 11 }
   = render 'service_calendars/master_calendar/pppv/check_visit_columns', service_request: service_request, sub_service_request: sub_service_request, tab: tab, portal: portal, visit_groups: visit_groups, page: page
 
   -unless portal

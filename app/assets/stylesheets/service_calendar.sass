@@ -56,29 +56,12 @@
       display: table
       width: 100%
       table-layout: fixed
-    thead
+    thead.scrolling-thead
       width: calc( 100% - 1em )
-    .scrolling-thead
-      border-bottom: 2px solid #DDD
-      tr:not(:first-child)
-        border-bottom: 1px solid #ddd
-      th
-        border-bottom: 0
-      th.template-service-header
-        width: 20%
-      th.status-width
-        width: 7%
-      th.notes-width
-        width: 4.5%
-      th.smaller-width
-        width: 3.8%
-      th.small-width
-        width: 6.17%
-      th.total-width
-        width: 7%
-      .popover
-        color: black
     tbody
+      .organization-header
+        background: #CCC
+    tbody.scrolling-div
       font-size: 13px
       td.service-name
         width: 20%
@@ -93,19 +76,53 @@
       td.total-width
         width: 7%
       td.max-total-per-patient-width,
+      td.maximum-total-direct-cost-per-patient-width,
       td.total-per-patient-per-visit-cost-per-study-width,
+        width: 54.2%
+      td.maximum-total-per-patient-width-template,
+      td.maximum-total-direct-cost-per-patient-template,
+      td.total-per-patient-per-visit-cost-per-study-width-template,
         width: 56.5%
 
+    .scrolling-thead
+      border-bottom: 2px solid #DDD
+      tr:not(:first-child)
+        border-bottom: 1px solid #ddd
+      th
+        border-bottom: 0
+      th.template-otf-service-header,
+      th.portal-consolidated-service-header,
+      th.consolidated-service-header,
+      th.billing-service-header,
+      th.template-service-header,
+        width: 20%
+      th.status-width
+        width: 7%
+      th.notes-width
+        width: 4.5%
+      th.smaller-width
+        width: 3.8%
+      th.small-width
+        width: 6.17%
+      th.total-width
+        width: 7%
+      .popover
+        color: black
 
-
-      .organization-header
-        background: #CCC
     .scrolling-div
       display: block
       overflow: auto
       height: 100%
       max-height: 450px !important
 
+      th.billing-organization-header-start-width
+        width: 54.2%
+      th.billing-organization-header-end-width
+        width: 14%
+      tr
+        display: table
+        width: 100%
+        table-layout: fixed
 
 .service-calendar-row,
 .service-calendar-column
