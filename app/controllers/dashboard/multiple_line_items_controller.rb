@@ -81,7 +81,6 @@ class Dashboard::MultipleLineItemsController < Dashboard::BaseController
     @service_request = ServiceRequest.find(params[:service_request_id])
     @sub_service_request = SubServiceRequest.find(params[:sub_service_request_id])
     @service = Service.find(params[:remove_service_id])
-
     @line_items = @sub_service_request.line_items.where(service_id: @service.id)
     @line_items.each(&:destroy)
     flash.now[:alert] = t(:dashboard)[:multiple_line_items][:destroyed]
