@@ -66,7 +66,7 @@ RSpec.describe 'User interacts with Quantity/Billing tab', js: true do
       click_link 'Quantity/Billing Tab'
       wait_for_javascript_to_finish
 
-      expect(page).to have_selector('.panel-title', text: "Per Patient/Visit Services -- #{@arm.name}")
+      expect(page).to have_selector('.panel-title', text: "Clinical Services Arm: #{@arm.name}")
     end
   end
 

@@ -22,6 +22,8 @@
   .panel-heading
     .pull-left
       %h3.panel-title
+        = t(:calendars)[:pppv][:clinical_services]
+        %br
         = I18n.t('calendars.pppv.header', arm_name: arm.name)
     .pull-right
       = render 'service_calendars/master_calendar/pppv/pppv_freeze_header_button', tab: tab, portal: portal, arm: arm, service_request: service_request, sub_service_request: sub_service_request, merged: merged, statuses_hidden: statuses_hidden

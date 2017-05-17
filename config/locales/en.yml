@@ -177,7 +177,8 @@ en:
       billing: "Quantity/Billing Tab"
       pricing: "Consolidated Request Tab"
     pppv:
-      header: "Per Patient/Visit Services -- %{arm_name}"
+      clinical_services: "Clinical Services"
+      header: "Arm: %{arm_name}"
       header_fields:
         notes: "Notes"
         service: "Service Name"
