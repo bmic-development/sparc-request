@@ -40,7 +40,9 @@ class Surveyor::ResponsesController < ApplicationController
     respond_to do |format|
       format.html {
         @review = 'false'
-        @sub_service_request = SubServiceRequest.find(params[:sub_service_request_id])
+        if params[:sub_service_request_id]
+          @sub_service_request = SubServiceRequest.find(params[:sub_service_request_id])
+        end
       }
       format.js {
         @review = 'true'
