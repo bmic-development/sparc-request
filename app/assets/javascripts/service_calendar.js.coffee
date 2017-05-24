@@ -196,6 +196,10 @@ calculate_max_rates = (arm_id) ->
 getSRId = ->
   $("input[name='service_request_id']").val()
 
+updateTotalCost = ->
+  data = $('#sub_service_request_status').data('sub_service_request_id')
+  $("#display_total_cost").load("#{data} #display_total_cost")
+
 (exports ? this).setup_xeditable_fields = () ->
   reload_calendar = (arm_id) ->
     # E.g. "billing-strategy-tab" -> "billing_strategy"
@@ -267,6 +271,7 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: ->
+      updateTotalCost()
 
   $('.edit-subject-count').editable
     params: (params) ->
@@ -277,7 +282,7 @@ getSRId = ->
       }
     success: () ->
       reload_calendar($(this).data('armId'))
-
+      updateTotalCost()
   $('.edit-research-billing-qty').editable
     params: (params) ->
       {
@@ -287,7 +292,7 @@ getSRId = ->
       }
     success: () ->
       reload_calendar($(this).data('armId'))
-
+      updateTotalCost()
   $('.edit-insurance-billing-qty').editable
     params: (params) ->
       {
@@ -295,6 +300,8 @@ getSRId = ->
           insurance_billing_qty: params.value
         service_request_id: getSRId()
       }
+    success: () ->
+      updateTotalCost()
 
   $('.edit-effort-billing-qty').editable
     params: (params) ->
@@ -303,6 +310,8 @@ getSRId = ->
           effort_billing_qty: params.value
         service_request_id: getSRId()
       }
+    success: () ->
+      updateTotalCost()
 
   $('.edit-qty').editable
     params: (params) ->
