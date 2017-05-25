@@ -27,11 +27,40 @@ $(document).ready ->
   getSSRId = ->
     $("input[name='sub_service_request_id']").val()
 
+  # addScroll = (container) ->
+  #   container.find('table').addClass('scrolling-table')
+  #   container.find('thead').addClass('scrolling-thead')
+  #   container.find('tbody').addClass('scrolling-div')
+  #   $(this).find('.freeze-header').hide()
+  #   $(this).find('.unfreeze-header').show()
+  #   $(this).removeClass('freeze')
+  #   $(this).addClass('unfreeze')
+
   $(document).on 'click', '.custom-tab a', ->
     if $(this).is('#billing-strategy-tab')
       $('.billing-info ul').removeClass('hidden')
     else
       $('.billing-info ul').addClass('hidden')
+
+  # $(document).on 'click', '#service-calendar .custom-tab.active a', ->
+  #   if $('.otf-calendar .scrolling-div').length == 1
+  #     console.log("adding classes")
+  #     $('.otf-calendar').find('table').addClass('scrolling-table')
+  #     $('.otf-calendar').find('thead').addClass('scrolling-thead')
+  #     $('.otf-calendar').find('tbody').addClass('scrolling-div')
+  #     $('.otf-calendar .freeze-header-button').find('.freeze-header').hide()
+  #     $('.otf-calendar .freeze-header-button').find('.unfreeze-header').show()
+  #     $('.otf-calendar .freeze-header-button').removeClass('freeze')
+  #     $('.otf-calendar .freeze-header-button').addClass('unfreeze')
+  #   else
+  #     $('.otf-calendar').find('table').removeClass('scrolling-table')
+  #     $('.otf-calendar').find('table').addClass('non-scrolling-table')
+  #     $('.otf-calendar').find('thead').removeClass('scrolling-thead')
+  #     $('.otf-calendar').find('tbody').removeClass('scrolling-div')
+  #     $('.otf-calendar .freeze-header-button').find('.unfreeze-header').hide()
+  #     $('.otf-calendar .freeze-header-button').find('.freeze-header').show()
+  #     $('.otf-calendar .freeze-header-button').removeClass('unfreeze')
+  #     $('.otf-calendar .freeze-header-button').addClass('freeze')
 
   $(document).on 'click', '.page-change-arrow', ->
     unless $(this).attr('disabled')
@@ -100,12 +129,19 @@ $(document).ready ->
       $(this).addClass('freeze')
 
   $(document).on 'change', '.visit-quantity', ->
+
+    if $(".scrolling-div").length == 1
+      scroll = true
+    else
+      scroll = false
+
     checked = $(this).is(':checked')
     obj     = $(this)
 
     $.ajax
       type: 'PUT'
       data:
+        scroll: scroll
         checked:  checked
         visit_id: $(this).data('visit-id')
         portal: $(this).data('portal')
@@ -197,6 +233,11 @@ getSRId = ->
   $("input[name='service_request_id']").val()
 
 (exports ? this).setup_xeditable_fields = () ->
+
+  if $('.otf-calendar .scrolling-div').length == 1
+    scroll = true
+  else
+    scroll = false
   reload_calendar = (arm_id) ->
     # E.g. "billing-strategy-tab" -> "billing_strategy"
     tab = $('li.custom-tab.active a').last().attr('id')
@@ -305,15 +346,17 @@ getSRId = ->
       }
 
   $('.edit-qty').editable
+
     params: (params) ->
       {
+        scroll: scroll
         line_item:
           quantity: params.value
         service_request_id: getSRId()
       }
     success: ->
       $('#service-calendar .custom-tab.active a').click()
-
+      
   $('.edit-units-per-qty').editable
     params: (params) ->
       {

@@ -42,6 +42,7 @@ class ServiceCalendarsController < ApplicationController
 
   def update
     visit         = Visit.find(params[:visit_id])
+    @scroll       = params[:scroll]
     @arm          = Arm.find(params[:arm_id])
     @tab          = params[:tab]
     @merged       = params[:merged] == 'true'
@@ -73,6 +74,8 @@ class ServiceCalendarsController < ApplicationController
   end
 
   def table
+    binding.pry
+    @scroll       = params[:scroll]
     @tab          = params[:tab]
     @review       = params[:review] == 'true'
     @portal       = params[:portal] == 'true'
