@@ -42,7 +42,7 @@ class ServiceCalendarsController < ApplicationController
 
   def update
     visit         = Visit.find(params[:visit_id])
-    @scroll       = params[:scroll]
+    @scroll_true  = params[:scroll].present? && params[:scroll] == 'true'
     @arm          = Arm.find(params[:arm_id])
     @tab          = params[:tab]
     @merged       = params[:merged] == 'true'
@@ -74,8 +74,7 @@ class ServiceCalendarsController < ApplicationController
   end
 
   def table
-    binding.pry
-    @scroll       = params[:scroll]
+    @scroll_true  = params[:scroll].present? && params[:scroll] == 'true'
     @tab          = params[:tab]
     @review       = params[:review] == 'true'
     @portal       = params[:portal] == 'true'
@@ -145,6 +144,7 @@ class ServiceCalendarsController < ApplicationController
     @line_items_visit  = LineItemsVisit.find(params[:line_items_visit_id])
     @service           = @line_items_visit.line_item.service if params[:check]
     @portal            = params[:portal] == 'true'
+    @scroll_true       = params[:scroll].present? && params[:scroll] == 'true'
 
     return unless @line_items_visit.sub_service_request.can_be_edited? || @portal
 

@@ -27,40 +27,11 @@ $(document).ready ->
   getSSRId = ->
     $("input[name='sub_service_request_id']").val()
 
-  # addScroll = (container) ->
-  #   container.find('table').addClass('scrolling-table')
-  #   container.find('thead').addClass('scrolling-thead')
-  #   container.find('tbody').addClass('scrolling-div')
-  #   $(this).find('.freeze-header').hide()
-  #   $(this).find('.unfreeze-header').show()
-  #   $(this).removeClass('freeze')
-  #   $(this).addClass('unfreeze')
-
   $(document).on 'click', '.custom-tab a', ->
     if $(this).is('#billing-strategy-tab')
       $('.billing-info ul').removeClass('hidden')
     else
       $('.billing-info ul').addClass('hidden')
-
-  # $(document).on 'click', '#service-calendar .custom-tab.active a', ->
-  #   if $('.otf-calendar .scrolling-div').length == 1
-  #     console.log("adding classes")
-  #     $('.otf-calendar').find('table').addClass('scrolling-table')
-  #     $('.otf-calendar').find('thead').addClass('scrolling-thead')
-  #     $('.otf-calendar').find('tbody').addClass('scrolling-div')
-  #     $('.otf-calendar .freeze-header-button').find('.freeze-header').hide()
-  #     $('.otf-calendar .freeze-header-button').find('.unfreeze-header').show()
-  #     $('.otf-calendar .freeze-header-button').removeClass('freeze')
-  #     $('.otf-calendar .freeze-header-button').addClass('unfreeze')
-  #   else
-  #     $('.otf-calendar').find('table').removeClass('scrolling-table')
-  #     $('.otf-calendar').find('table').addClass('non-scrolling-table')
-  #     $('.otf-calendar').find('thead').removeClass('scrolling-thead')
-  #     $('.otf-calendar').find('tbody').removeClass('scrolling-div')
-  #     $('.otf-calendar .freeze-header-button').find('.unfreeze-header').hide()
-  #     $('.otf-calendar .freeze-header-button').find('.freeze-header').show()
-  #     $('.otf-calendar .freeze-header-button').removeClass('unfreeze')
-  #     $('.otf-calendar .freeze-header-button').addClass('freeze')
 
   $(document).on 'click', '.page-change-arrow', ->
     unless $(this).attr('disabled')
@@ -70,11 +41,13 @@ $(document).ready ->
 
   $(document).on 'click', '.service-calendar-row', ->
     return false if $(this).attr("disabled")
-
+    scroll = $(this).parents('.scrolling-div').length == 1
+    $(this).attr('data-url', $(this).data('url') + "&scroll=#{scroll}")
     if confirm(I18n['calendars']['confirm_row_select'])
       $.ajax
         type: 'post'
-        url: $(this).data('url')
+        url: $(this).attr('data-url')
+    reload_calendar($(this).data('armId'), scroll)
 
   $(document).on 'click', '.service-calendar-column', ->
     if confirm(I18n['calendars']['confirm_column_select'])
@@ -130,11 +103,7 @@ $(document).ready ->
 
   $(document).on 'change', '.visit-quantity', ->
 
-    if $(".scrolling-div").length == 1
-      scroll = true
-    else
-      scroll = false
-
+    scroll = $(this).parents('.scrolling-div').length == 1
     checked = $(this).is(':checked')
     obj     = $(this)
 
@@ -200,6 +169,20 @@ $(document).ready ->
       data: data
   # NOTES LISTENERS END
 
+  reload_calendar = (arm_id, scroll) ->
+    # E.g. "billing-strategy-tab" -> "billing_strategy"
+    tab = $('li.custom-tab.active a').last().attr('id')
+    tab = tab.substring(0, tab.indexOf("tab") - 1).replace("-", "_")
+    data = $('#service-calendars').data()
+    data.scroll = scroll
+    data.tab = tab
+    data.arm_id = arm_id
+    data.service_request_id = getSRId()
+    data.sub_service_request_id = data.subServiceRequestId
+    data.protocol_id = data.protocolId
+    # Reload calendar
+    $.get '/service_calendars/table.js', data
+
 
 (exports ? this).changing_tabs_calculating_rates = ->
   arm_ids = []
@@ -233,16 +216,12 @@ getSRId = ->
   $("input[name='service_request_id']").val()
 
 (exports ? this).setup_xeditable_fields = () ->
-
-  if $('.otf-calendar .scrolling-div').length == 1
-    scroll = true
-  else
-    scroll = false
-  reload_calendar = (arm_id) ->
+  reload_calendar = (arm_id, scroll) ->
     # E.g. "billing-strategy-tab" -> "billing_strategy"
     tab = $('li.custom-tab.active a').last().attr('id')
     tab = tab.substring(0, tab.indexOf("tab") - 1).replace("-", "_")
     data = $('#service-calendars').data()
+    data.scroll = scroll
     data.tab = tab
     data.arm_id = arm_id
     data.service_request_id = getSRId()
@@ -317,7 +296,8 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: () ->
-      reload_calendar($(this).data('armId'))
+      scroll = $(this).parents('.scrolling-div').length == 1
+      reload_calendar($(this).data('armId'), scroll)
 
   $('.edit-research-billing-qty').editable
     params: (params) ->
@@ -327,7 +307,8 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: () ->
-      reload_calendar($(this).data('armId'))
+      scroll = $(this).parents('.scrolling-div').length == 1
+      reload_calendar($(this).data('armId'), scroll)
 
   $('.edit-insurance-billing-qty').editable
     params: (params) ->
@@ -349,13 +330,14 @@ getSRId = ->
 
     params: (params) ->
       {
-        scroll: scroll
         line_item:
           quantity: params.value
         service_request_id: getSRId()
       }
     success: ->
-      $('#service-calendar .custom-tab.active a').click()
+      scroll = $(this).parents('.scrolling-div').length == 1
+      reload_calendar($(this).data('armId'), scroll)
+        
       
   $('.edit-units-per-qty').editable
     params: (params) ->
@@ -365,4 +347,5 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: ->
-      $('#service-calendar .custom-tab.active a').click()
+      scroll = $(this).parents('.scrolling-div').length == 1
+      reload_calendar($(this).data('armId'), scroll)

@@ -26,7 +26,6 @@ class LineItemsController < ApplicationController
 
   # Used for x-editable update and validations
   def update
-    @scroll           = params[:scroll]
     @line_item        = LineItem.find( params[:id] )
     @service_request  = ServiceRequest.find( params[:srid] )
 
