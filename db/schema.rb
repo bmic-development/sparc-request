@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170531192636) do
+ActiveRecord::Schema.define(version: 20170601171046) do
 
   create_table "admin_rates", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "line_item_id"
@@ -409,7 +409,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["question_id"], name: "index_options_on_question_id", using: :btree
   end
 
-  create_table "organizations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "organizations", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string   "type"
     t.string   "name"
     t.integer  "order"
@@ -427,7 +427,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["parent_id"], name: "index_organizations_on_parent_id", using: :btree
   end
 
-  create_table "past_statuses", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "past_statuses", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.integer  "sub_service_request_id"
     t.string   "status"
     t.datetime "date"
@@ -439,7 +439,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["sub_service_request_id"], name: "index_past_statuses_on_sub_service_request_id", using: :btree
   end
 
-  create_table "past_subsidies", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
+  create_table "past_subsidies", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "sub_service_request_id"
     t.integer  "total_at_approval"
     t.integer  "approved_by"
@@ -451,7 +451,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["sub_service_request_id"], name: "index_past_subsidies_on_sub_service_request_id", using: :btree
   end
 
-  create_table "payment_uploads", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "payment_uploads", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer  "payment_id"
     t.datetime "created_at",        null: false
     t.datetime "updated_at",        null: false
@@ -462,7 +462,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["payment_id"], name: "index_payment_uploads_on_payment_id", using: :btree
   end
 
-  create_table "payments", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
+  create_table "payments", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=latin1" do |t|
     t.integer  "sub_service_request_id"
     t.date     "date_submitted"
     t.decimal  "amount_invoiced",                      precision: 12, scale: 4
@@ -476,7 +476,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["sub_service_request_id"], name: "index_payments_on_sub_service_request_id", using: :btree
   end
 
-  create_table "pricing_maps", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "pricing_maps", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.integer  "service_id"
     t.string   "unit_type"
     t.decimal  "unit_factor",                precision: 5,  scale: 2
@@ -500,7 +500,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["service_id"], name: "index_pricing_maps_on_service_id", using: :btree
   end
 
-  create_table "pricing_setups", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "pricing_setups", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.integer  "organization_id"
     t.date     "display_date"
     t.date     "effective_date"
@@ -520,7 +520,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["organization_id"], name: "index_pricing_setups_on_organization_id", using: :btree
   end
 
-  create_table "professional_organizations", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
+  create_table "professional_organizations", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.text    "name",      limit: 65535
     t.string  "org_type"
     t.integer "parent_id"
@@ -540,7 +540,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.index ["protocol_id"], name: "index_project_roles_on_protocol_id", using: :btree
   end
 
-  create_table "protocol_filters", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
+  create_table "protocol_filters", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "identity_id"
     t.string   "search_name"
     t.boolean  "show_archived"
@@ -553,7 +553,7 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.string   "with_owner"
   end
 
-  create_table "protocols", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
+  create_table "protocols", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci" do |t|
     t.string   "type"
     t.integer  "next_ssr_id"
     t.string   "short_title"
@@ -867,10 +867,10 @@ ActiveRecord::Schema.define(version: 20170531192636) do
     t.integer  "service_id"
     t.integer  "identity_id"
     t.integer  "questionnaire_id"
-    t.integer  "protocol_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
     t.bigint   "line_item_id"
+    t.bigint   "protocol_id"
     t.index ["identity_id"], name: "index_submissions_on_identity_id", using: :btree
     t.index ["line_item_id"], name: "index_submissions_on_line_item_id", using: :btree
     t.index ["protocol_id"], name: "index_submissions_on_protocol_id", using: :btree
