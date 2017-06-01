@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170531192513) do
+ActiveRecord::Schema.define(version: 20170531192636) do
 
   create_table "admin_rates", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "line_item_id"
@@ -401,7 +401,7 @@ ActiveRecord::Schema.define(version: 20170531192513) do
     t.index ["sub_service_request_id"], name: "index_notifications_on_sub_service_request_id", using: :btree
   end
 
-  create_table "options", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
+  create_table "options", id: :bigint, default: nil, force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin" do |t|
     t.integer  "question_id"
     t.text     "content",     limit: 65535, null: false
     t.datetime "created_at",                null: false
@@ -641,7 +641,7 @@ ActiveRecord::Schema.define(version: 20170531192513) do
     t.boolean  "required",                    null: false
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
-    t.integer  "depender_id"
+    t.bigint   "depender_id"
     t.index ["depender_id"], name: "index_questions_on_depender_id", using: :btree
     t.index ["section_id"], name: "index_questions_on_section_id", using: :btree
   end
