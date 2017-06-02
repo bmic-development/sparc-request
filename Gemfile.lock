@@ -597,7 +597,7 @@ DEPENDENCIES
   pry
   puma (~> 3.0)
   rack-mini-profiler
-  rails (~> 5.1)
+  rails (~> 5.1, >= 5.1.1)
   rails-controller-testing
   rails-erd
   rails-html-sanitizer
