@@ -21,6 +21,7 @@
 #= require navigation
 
 $(document).ready ->
+
   getSRId = ->
     $("input[name='service_request_id']").val()
 
@@ -34,15 +35,17 @@ $(document).ready ->
       $('.billing-info ul').addClass('hidden')
 
   $(document).on 'click', '.page-change-arrow', ->
+    scroll = $(this).parents('.scrolling-thead').length > 0
     unless $(this).attr('disabled')
       $.ajax
         type: 'GET'
         url: $(this).data('url')
+        data:
+          scroll: scroll
 
   $(document).on 'click', '.service-calendar-row', ->
     return false if $(this).attr("disabled")
-    scroll = $(this).parents('.scrolling-div').length == 1
-    $(this).attr('data-url', $(this).data('url') + "&scroll=#{scroll}")
+    scroll = $(this).parents('.scrolling-div').length > 0
     if confirm(I18n['calendars']['confirm_row_select'])
       $.ajax
         type: 'post'
@@ -50,12 +53,15 @@ $(document).ready ->
     reload_calendar($(this).data('armId'), scroll)
 
   $(document).on 'click', '.service-calendar-column', ->
+    scroll = $(this).parents('.scrolling-thead').length > 0
     if confirm(I18n['calendars']['confirm_column_select'])
       $.ajax
         type: 'post'
         url: $(this).data('url')
+    reload_calendar($(this).data('armId'), scroll)
 
   $(document).on 'change', '.visit-group-select .selectpicker', ->
+    scroll = $(this).parents('.scrolling-thead').length > 0
     page = $(this).find('option:selected').attr('page')
 
     $.ajax
@@ -63,6 +69,7 @@ $(document).ready ->
       url: $(this).data('url')
       data:
         page: page
+        scroll: scroll
 
   $(document).on 'click', '.move-visit-button', ->
     arm_id = $(this).data('arm-id')
@@ -74,8 +81,11 @@ $(document).ready ->
         service_request_id: getSRId()
     return false
 
-  $(document).on 'click', '.freeze-header-button', ->
+  $(document).on 'ajax:success', '.move-visit-modal', ->
+    scroll = $(this).parents('footer').siblings('#container').find('.scrolling-div').length > 0
+    reload_calendar($(this).data('armId'), scroll)
 
+  $(document).on 'click', '.freeze-header-button', ->
     arm = $(this).data('arm-id')
 
     if arm == 'otf-calendar'
@@ -103,7 +113,7 @@ $(document).ready ->
 
   $(document).on 'change', '.visit-quantity', ->
 
-    scroll = $(this).parents('.scrolling-div').length == 1
+    scroll = $(this).parents('.scrolling-div').length > 0
     checked = $(this).is(':checked')
     obj     = $(this)
 
@@ -287,6 +297,8 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: ->
+      scroll = $(this).parents('.scrolling-div').length > 0
+      reload_calendar($(this).data('armId'), scroll)
 
   $('.edit-subject-count').editable
     params: (params) ->
@@ -296,7 +308,7 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: () ->
-      scroll = $(this).parents('.scrolling-div').length == 1
+      scroll = $(this).parents('.scrolling-div').length > 0
       reload_calendar($(this).data('armId'), scroll)
 
   $('.edit-research-billing-qty').editable
@@ -307,7 +319,7 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: () ->
-      scroll = $(this).parents('.scrolling-div').length == 1
+      scroll = $(this).parents('.scrolling-div').length > 0
       reload_calendar($(this).data('armId'), scroll)
 
   $('.edit-insurance-billing-qty').editable
@@ -335,7 +347,7 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: ->
-      scroll = $(this).parents('.scrolling-div').length == 1
+      scroll = $(this).parents('.scrolling-div').length > 0
       reload_calendar($(this).data('armId'), scroll)
         
       
@@ -347,5 +359,5 @@ getSRId = ->
         service_request_id: getSRId()
       }
     success: ->
-      scroll = $(this).parents('.scrolling-div').length == 1
+      scroll = $(this).parents('.scrolling-div').length > 0
       reload_calendar($(this).data('armId'), scroll)

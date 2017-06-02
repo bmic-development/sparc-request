@@ -133,7 +133,7 @@ module Dashboard
       options_for_select(arr, cur_page)
     end
 
-    def self.select_row(line_items_visit, sub_service_request, portal, locked=false)
+    def self.select_row(line_items_visit, sub_service_request, portal, locked=false, arm_id)
       checked        = line_items_visit.visits.all? { |v| v.research_billing_qty >= 1  }
       check_param    = checked ? 'uncheck' : 'check'
       icon           = checked ? 'glyphicon-remove' : 'glyphicon-ok'
@@ -144,10 +144,10 @@ module Dashboard
       url        += "&sub_service_request_id=#{sub_service_request.id}" if sub_service_request
 
       content_tag(:span, '', class: "glyphicon #{icon} btn btn-xs #{klass} service-calendar-row",
-                  id: "check-all-row-#{line_items_visit.id}", data: { toggle: "tooltip", animation: 'false', title: tooltip_row, url: url }, disabled: locked)
+                  id: "check-all-row-#{line_items_visit.id}", data: { toggle: "tooltip", animation: 'false', title: tooltip_row, url: url, arm_id: arm_id }, disabled: locked)
     end
 
-    def self.select_column(visit_group, n, portal, service_request, sub_service_request)
+    def self.select_column(visit_group, n, portal, service_request, sub_service_request, arm_id)
 
       arm_id        = visit_group.arm_id
       # If we are in proper, we want to use service request, othewise in dashboard, we use SSR for admin study schedule
@@ -166,7 +166,7 @@ module Dashboard
         role: 'button',
         class: "btn btn-xs #{klass} service-calendar-column glyphicon #{icon}",
         id: "check-all-column-#{n+1}",
-        data: { toggle: "tooltip", animation: 'false', title: tooltip_column, url: url })
+        data: { toggle: "tooltip", animation: 'false', title: tooltip_column, url: url, arm_id: arm_id })
     end
   end
 end

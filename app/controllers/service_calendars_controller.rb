@@ -134,6 +134,7 @@ class ServiceCalendarsController < ApplicationController
   end
 
   def move_visit_position
+    @scroll_true  = params[:scroll].present? && params[:scroll] == 'true'
     arm = Arm.find( params[:arm_id] )
     vg  = arm.visit_groups.find( params[:visit_group].to_i )
 
@@ -144,7 +145,6 @@ class ServiceCalendarsController < ApplicationController
     @line_items_visit  = LineItemsVisit.find(params[:line_items_visit_id])
     @service           = @line_items_visit.line_item.service if params[:check]
     @portal            = params[:portal] == 'true'
-    @scroll_true       = params[:scroll].present? && params[:scroll] == 'true'
 
     return unless @line_items_visit.sub_service_request.can_be_edited? || @portal
 

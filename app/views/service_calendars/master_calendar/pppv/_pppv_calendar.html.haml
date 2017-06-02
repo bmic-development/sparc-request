@@ -31,6 +31,7 @@
           = t(:proper)[:service_calendar][:move_visit][:header]
         .divider
     .clearfix
+
   = hidden_field_tag :service_request_id, service_request.id
   %table.table.table-bordered{ class: @scroll_true ? "scrolling-table" : "non-scrolling-table" }
     %thead{ class: @scroll_true ? "scrolling-thead" : "" }
