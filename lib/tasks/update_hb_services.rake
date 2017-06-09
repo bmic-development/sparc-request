@@ -118,6 +118,9 @@ task :update_hb_services => :environment do
           unless service.name == row['Procedure Name']
             service_names << [service.id, service.name]
             puts "Altering the name of service with an id of #{service.id} from #{service.name} to #{row['Procedure Name']}"
+            if service.name == service.abbreviation
+              service.abbreviation = row['Procedure Name']
+            end
             service.name = row['Procedure Name'] 
           end
 
