@@ -40,6 +40,4 @@ $ ->
     new_str += word.charAt(0).toUpperCase() + word.slice(1) + ' '
   return new_str
 
-(exports ? this).refresh_study_schedule = () ->
-  $('#service-calendar .tab-content .tab-pane.active').load $('#service-calendar .active a').attr("data-url"), (result) ->
-    $('#service-calendar .active a').tab('show')
+
